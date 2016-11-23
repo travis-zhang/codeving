@@ -1,2 +1,71 @@
 the github good resources url:
 
+IT－知识  ｛all github－所有的编程相关名词索引｝
+https://zeef.com/
+https://awesome-awesomeness.zeef.com/alexander.bayandin
+https://github.com/bayandin/awesome-awesomeness
+https://github.com/akullpp/awesome-java
+
+GitHub－oschina（论坛）
+http://www.oschina.net/question/tag/github
+
+GitHub 上比较有意思的项目
+http://www.oschina.net/question/587367_212543
+
+github优秀前端项目分享
+http://www.cnblogs.com/webpush/p/4963002.html
+	（http://microjs.com/  好看,有意思——js搜索引擎）
+
+gitbook
+https://www.gitbook.com/explore
+
+github － 常见项目
+https://github.com/apache
+https://github.com/spring-projects
+https://github.com/hibernate
+https://github.com/mybatis
+https://github.com/reactjs
+https://github.com/facebook/react-devtools
+https://github.com/react-component
+[Spring Boot React Example
+https://github.com/winterbe/spring-react-example]
+Spring Boot and React hot loader
+http://geowarin.github.io/spring-boot-and-react-hot.html
+react-component
+http://react-component.github.io/badgeboard/
+
+https://github.com/google
+https://github.com/facebook
+https://github.com/alibaba
+https://github.com/taobao
+https://github.com/alipay
+https://github.com/baidu
+https://github.com/echarts
+https://github.com/Rubinius（很牛逼，不知道是啥）
+https://github.com/Merb（很牛逼，不知道是啥）
+https://github.com/github（很牛逼，不知道是啥）
+https://github.com/jQuery
+
+腾讯WEB前端团队
+https://github.com/AlloyTeam
+百度前端团队
+https://github.com/fex-team
+
+源码搜索
+http://grepcode.com/
+
+Maven
+http://repo1.maven.org/maven2/
+http://search.maven.org/
+http://search.maven.org/#resources
+
+Maven: The Complete Reference
+Maven by Example
+Repository Management with Nexus
+http://www.sonatype.org/nexus/resources/resources-book-links-and-downloads/
+
+－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+mac软件bt下载
+http://www.mac-torrents.com/torrents.php
+http://mac.eltima.com/mac-products.html
+https://bitport.io/welcome
