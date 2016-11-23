@@ -64,7 +64,7 @@ Maven by Example
 Repository Management with Nexus
 http://www.sonatype.org/nexus/resources/resources-book-links-and-downloads/
 
-－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+
 mac软件bt下载
 http://www.mac-torrents.com/torrents.php
 http://mac.eltima.com/mac-products.html
