@@ -1,0 +1,2288 @@
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="css/NetAttackVisualization.css">
+    <link rel="stylesheet" href="css/font.css">
+    <link rel="stylesheet" href="css/flags.css">
+    <link rel="stylesheet" href="css/jquery.mCustomScrollbar.css">
+    <script src="d3/d3.min.js"></script>
+    <script src="d3/d3.geo.projection.min.js"></script>
+    <script src="d3/topojson.v1.min.js"></script>
+    <script src="d3/queue.v1.min.js"></script>
+    <script src="js/jquery-1.11.3.js"></script>
+    <script src="js/layer/layer.js"></script>
+    <script src="js/jquery.mousewheel.js"></script>
+    <script src="js/jquery.mCustomScrollbar.min.js"></script>
+    <script src="config.js"></script>
+</head>
+<body>
+<canvas></canvas>
+<img class="netbutton icon-Fullscreen" src="img/icon_fullscreen.png" onclick="switchFullscreen(document.documentElement)">
+<img id="switchMode" class="netbutton icon-switchmode" src="img/icon_flatMode.png" onclick="switchmode()">
+<img id="switchInfo" class="netbutton icon-switchinfo" src="img/icon_infoon.png" onclick="toogle()">
+
+<!-- 攻击源列表 -->
+<div id="display-label" class="tip" style="position:absolute;left:0;top:0;display:none;"></div>
+<div class="left-top container data">
+    <div class="data-header">
+        <span class="icon-open flag pointer"></span>
+        攻击源
+    </div>
+    <div id="infoLeftTop" class="table">
+        <table id="left-data">
+            <colgroup>
+                <col class="bar-col" span="1"/>
+                <col class="total-count" span="1"/>
+                <col class="data-label-small" span="1"/>
+                <col class="data-label" span="1"/>
+            </colgroup>
+            <tr>
+                <th></th>
+                <th><span class="icon-number"></span></th>
+                <th><span class="icon-country"></span></th>
+                <th>国家</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- 攻击列表 -->
+<div class="bottom-left container">
+    <div class="data-header">
+        <span class="icon-open pointer"></span>
+        攻击列表
+    </div>
+    <div id="infoBottomLeft" class="table mCustomScrollbar" data-mcs-theme="minimal"
+         style="max-height: 200px;overflow: auto">
+        <table id="events-data">
+            <colgroup class="second-level">
+                <col class="timestamp-col" span="1">
+                <!--<col class="attacker-org-col left-border" span="1">-->
+                <col class="location-col" span="1">
+                <col class="attacker-ip-col" span="1">
+                <col class="location-col left-border" span="1">
+                <col class="service-col left-border" span="1">
+                <col class="port-col" span="1">
+            </colgroup>
+
+            <tr class="first-level">
+                <th></th>
+                <th colspan="2" class="attacker">攻击者</th>
+                <th class="target">被攻击者</th>
+                <th colspan="2">攻击</th>
+            </tr>
+
+            <tr class="second-level">
+                <th>时间</th>
+                <!--<th>组织</th>-->
+                <th>位置</th>
+                <th>IP</th>
+                <th>位置</th>
+                <th>类型</th>
+                <th>端口</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- 攻击类型 -->
+<div class="bottom-right container data">
+    <div class="data-header">
+        <span class="icon-open pointer"></span>
+        攻击类型
+    </div>
+    <div id="infoBottomRight" class="table">
+        <table id="bottom-right-data">
+            <colgroup>
+                <col class="bar-col" span="1">
+                <col class="total-count" span="1">
+                <col class="data-label-small" span="1">
+                <col class="data-label" span="1">
+                <col class="port-label" span="1">
+            </colgroup>
+            <tr>
+                <th></th>
+                <th><span class="icon-number"></span></th>
+                <th><span class="icon-threattype"></span></th>
+                <th>攻击类型</th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- 主背景 -->
+<div id="content" class="overlay"></div>
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec2 a_position;
+void main(void) {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform sampler2D u_image;
+uniform vec2 u_translate;
+uniform float u_scale;
+uniform vec2 u_rotate;
+
+const float c_pi = 3.14159265358979323846264;
+const float c_halfPi = c_pi * 0.5;
+const float c_twoPi = c_pi * 2.0;
+
+float cosphi0 = cos(u_rotate.y);
+float sinphi0 = sin(u_rotate.y);
+
+void main(void) {
+  float x = (gl_FragCoord.x - u_translate.x) / u_scale;
+  float y = (u_translate.y - gl_FragCoord.y) / u_scale;
+
+  // inverse stereographic projection
+  float rho = sqrt(x * x + y * y);
+  float c = 2.0 * atan(rho);
+  float sinc = sin(c);
+  float cosc = cos(c);
+  float lambda = atan(x * sinc, rho * cosc);
+  float phi = asin(y * sinc / rho);
+
+  // inverse rotation
+  float cosphi = cos(phi);
+  float x1 = cos(lambda) * cosphi;
+  float y1 = sin(lambda) * cosphi;
+  float z1 = sin(phi);
+  lambda = atan(y1, x1 * cosphi0 + z1 * sinphi0) + u_rotate.x;
+  phi = asin(z1 * cosphi0 - x1 * sinphi0);
+
+  gl_FragColor = texture2D(u_image, vec2((lambda + c_pi) / c_twoPi, (phi + c_halfPi) / c_pi));
+}
+</script>
+
+<script type="text/javascript">
+    var worldData;
+    var ratio = 1;
+    var width = self.innerWidth * ratio;
+    var height = self.innerHeight * ratio;
+    var initial = [-110, 0.01, 0];
+    var velocity = [.01 * settings.speed, 0, 0];
+    var t0 = Date.now();
+    var pause = 0;
+    var isSphere = true;
+    var sphere = d3.geo.orthographic()
+            .clipAngle(90)
+            .scale(height / 2.5)
+            .translate([width / 2, height / 2])
+            .rotate([0, 0, 0]);
+    var flat = d3.geo.miller()
+            .clipAngle(180)
+            .scale(width / 6)
+            .rotate([0, 0, 0])
+            .translate([width / 2, height / 1.7]);
+    var projection = interpolatedProjection(flat, sphere).alpha(1);
+    var sky = interpolatedProjection(flat,sphere).alpha(1).scale(1.2);
+    var rotate = initial.slice();
+    var path = d3.geo.path().projection(projection);
+    var svg = d3.select("#content").append("svg")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height);
+    var refreshTargetPT = function () {
+        if (isSphere) return;
+        nodeModel.get(nodeModel.TARGETS)
+                .forEach(function (target) {
+                    // var startLoc = isSphere ? flat([target.fromLongitude, target.fromLatitude]) : projection([target.fromLongitude, target.fromLatitude]);
+                    var endLoc = isSphere ? flat([target.targetLongitude, target.targetLatitude]) : projection([target.targetLongitude, target.targetLatitude]);
+                    target.cx = endLoc[0];
+                    target.cy = endLoc[1];
+                    target.targetX = endLoc[0];
+                    target.targetY = endLoc[1];
+                });
+    };
+    var scale0 = projection.scale();
+    var translate = projection.translate();
+    var rotate0 = rotate;
+    var prjLoopInterval;
+    var prjLoopTimeout;
+    var sphereCycle;
+    var flatCycle;
+    var zoomMouseX, zoomMouseY;
+    var zoom = d3.behavior.zoom()
+            .scale(scale0)
+            .scaleExtent([scale0, 8 * scale0])
+            .translate([width / 2, height / 2])
+            .on("zoom", zoomed)
+            .on("zoomstart", function () {
+                if (d3.event.sourceEvent) {
+                    pause = 1;
+                    rotate0 = rotate;
+                    zoomMouseX = d3.event.sourceEvent.layerX || 0;
+                    zoomMouseY = d3.event.sourceEvent.layerY || 0;
+                }
+            })
+            .on("zoomend", function () {
+                t0 = Date.now();
+                initial = rotate.slice();
+                refreshTargetPT();
+            });
+
+    function switchmode() {
+        clearInterval(prjLoopInterval);
+        clearTimeout(sphereCycle);
+        clearTimeout(flatCycle);
+        pause = 1;
+        clearTimeout(prjLoopTimeout);
+        prjLoopTimeout = setTimeout(prjLoop, settings.idleTime * 60 * 1000);
+        switchPrj();
+    }
+    function zoomed() {
+        if (d3.event.sourceEvent) {
+            clearInterval(prjLoopInterval);
+            clearTimeout(sphereCycle);
+            clearTimeout(flatCycle);
+            pause = 1;
+            clearTimeout(prjLoopTimeout);
+            prjLoopTimeout = setTimeout(prjLoop, settings.idleTime * 60 * 1000);
+        }
+
+        if (!isSphere) {
+            projection.scale(d3.event.scale).translate(d3.event.translate);
+            refreshTargetPT();
+        } else {
+            projection.scale(d3.event.scale);
+            svg.selectAll("circle")
+                    .attr("r", sphere.scale() * d3.event.scale);
+
+            if (d3.event.sourceEvent) {
+                var movex = d3.event.sourceEvent.movementX || d3.event.sourceEvent.mozMovementX || d3.event.sourceEvent.webkitMovementX || 0;
+                var movey = d3.event.sourceEvent.movementY || d3.event.sourceEvent.mozMovementY || d3.event.sourceEvent.webkitMovementY || 0;
+                if (movex == 0 && movey == 0) {
+                    movex = (d3.event.sourceEvent.layerX - zoomMouseX) / 10;
+                    movey = (d3.event.sourceEvent.layerY - zoomMouseY) / 10;
+                }
+                if (movex < 300 && movey < 300) {
+                    rotate[0] = rotate0[0] + movex / (5 * d3.event.scale);
+                    rotate[1] = rotate0[1] - movey / (5 * d3.event.scale);
+                }
+            }
+            projection.rotate(rotate);
+        }
+    }
+
+    var canvas = d3.select("#content").append("canvas")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height)
+            .call(zoom);
+
+    var context = canvas.node().getContext("2d");
+
+    var canvasPath = d3.geo.path().projection(projection).context(context);
+
+    var displayLabel = {
+        elt: d3.select("#display-label"),
+        set: function (text, e) {
+            this.elt.text(text);
+
+            this.elt.style("left", e[0] + 10 + 'px', "");
+            this.elt.style("top", e[1] + 10 + 'px', "");
+            this.elt.style("display", "", "");
+        },
+        clear: function () {
+            this.elt.text("");
+            this.elt.style("display", "none", "");
+        },
+        mousePos: function (e) {
+
+        }
+    };
+
+    d3.select("#pause").on("click", switchPause);
+
+    function switchPause() {
+        if (!(pause ^= 4)) {
+            t0 = Date.now();
+            initial = rotate.slice();
+        }
+    }
+
+    d3.select("#tweenProj").on("click", switchPrj);
+
+    function switchPrj() {
+        canvas.on(".zoom", null);
+        painter.drawings.greatArcs.active = false;
+        painter.drawings.pings.active = false;
+        var fillOpacity = d3.scale.linear().domain([0, 1]).range([settings.SphereFillOpacity, settings.FlatFillOpacity]);
+        var strokeOpacity = d3.scale.linear().domain([0, 1]).range([settings.SphereStrokeOpacity, settings.FlatStrokeOpacity]);
+        var opaScale = d3.scale.linear().domain([0, 0.7, 1]).range([0, 0, 1]);
+        var fillColor = d3.interpolateRgb(settings.SphereFill, settings.FlatFill);
+        var strokeColor = d3.interpolateRgb(settings.SphereStroke, settings.FlatStroke);
+
+        var currentScale = projection.scale();
+        var currentTranslate = projection.translate();
+        var translateLinear = d3.scale.linear().domain([0, 0.5, 1]).range([currentTranslate, [width / 2, height / 2], [width / 2, height / 2]]);
+        var scaleLinear = d3.scale.linear().domain([0, 1]).range([currentScale, 1]);
+        d3.select("canvas").transition()
+                .duration(1500)
+                .tween("projection", function () {
+                    return function (_) {
+                        if (!isSphere) {
+                        	changebg(1);
+                            projection.alpha(_);
+                            svg.selectAll("circle").attr("opacity", opaScale(_));
+                            svg.select("#boundry")
+                                    .attr("stroke", rgbaString(strokeColor(1 - _), strokeOpacity(1 - _)));
+                            svg.select("#land")
+                                    .attr("fill", rgbaString(fillColor(1 - _), fillOpacity(1 - _)))
+                                    .attr("stroke", rgbaString(strokeColor(1 - _), strokeOpacity(1 - _)));
+                            
+                        } else {
+                        	changebg(0);
+                            projection.alpha(1 - _);
+                            svg.selectAll("circle").attr("opacity", 1 - _);
+                            svg.select("#boundry")
+                                    .attr("stroke", rgbaString(strokeColor(_), strokeOpacity(_)));
+                            svg.select("#land")
+                                    .attr("fill", rgbaString(fillColor(_), fillOpacity(_)))
+                                    .attr("stroke", rgbaString(strokeColor(_), strokeOpacity(_)))
+                                    .attr("strokewidth", "0.5");
+                        }
+                        projection.scale(scaleLinear(_)).translate(translateLinear(_));
+
+                    };
+                })
+                .each("end", function () {
+                    zoom.translate(projection.translate());
+                    refreshTargetPT();
+                    isSphere = !isSphere;
+                    zoom.scale(1);
+                    canvas.call(zoom)
+                            .call(zoom.event);
+                    var ro0 = projection.rotate();
+                    var rotateScale = d3.scale.linear().domain([0, 1]).range([ro0, [-110, 0.01, 0]]);
+
+                    d3.selectAll("canvas").transition()
+                            .duration(1500)
+                            .tween("projection", function () {
+                                return function (_) {
+                                    if (isSphere) {
+                                        rotate = rotateScale(_);
+
+                                        projection.rotate(rotate);
+                                    } else {
+                                        rotate = [(1 - _) * ro0[0] + 0.01, (1 - _) * ro0[1] + 0.01, (1 - _) * ro0[2]];
+                                        projection.rotate(rotate);
+                                    }
+
+                                }
+                            })
+                            .each("end", function () {
+                                refreshTargetPT();
+                                painter.drawings.greatArcs.active = settings.greatArcs;
+                                painter.drawings.pings.active = settings.pings;
+
+                                t0 = Date.now();
+                                initial = rotate.slice();
+                                if (pause) {
+                                    switchPause();
+                                }
+
+                                d3.select("#switchMode")
+                                        .attr("src", function () {
+                                            return isSphere ? "img/icon_flatMode.png" : "img/icon_sphereMode.png";
+                                        })
+
+
+                            });
+                });
+    }
+    function oneCycle() {
+        if (isSphere) {
+            sphereCycle = setTimeout(switchPrj, settings.sphereTime * 60 * 1000);
+            flatCycle = setTimeout(switchPrj, (settings.sphereTime + settings.flatTime) * 60 * 1000);
+        }
+        else {
+            flatCycle = setTimeout(switchPrj, settings.flatTime * 60 * 1000);
+            sphereCycle = setTimeout(switchPrj, (settings.sphereTime + settings.flatTime) * 60 * 1000);
+        }
+    }
+
+    function prjLoop() {
+        pause = 0;
+        t0 = Date.now();
+        initial = rotate.slice();
+        oneCycle();
+        prjLoopInterval = setInterval(oneCycle, (settings.sphereTime + settings.flatTime) * 60 * 1000);
+    }
+    prjLoop();
+
+
+    function interpolatedProjection(a, b) {
+        var projection = d3.geo.projection(raw).scale(1),
+                center = projection.center,
+                translate = projection.translate,
+                clipangle = projection.clipAngle,
+                α;
+
+        function raw(λ, φ) {
+            var pa = a([λ *= 180 / Math.PI, φ *= 180 / Math.PI]), pb = b([λ, φ]);
+            return [(1 - α) * pa[0] + α * pb[0], (α - 1) * pa[1] - α * pb[1]];
+        }
+
+        projection.alpha = function (_) {
+            if (!arguments.length) return α;
+            α = +_;
+            var ca = a.center(), cb = b.center(),
+                    ta = a.translate(), tb = b.translate();
+            center([(1 - α) * ca[0] + α * cb[0], (1 - α) * ca[1] + α * cb[1]]);
+            translate([(1 - α) * ta[0] + α * tb[0], (1 - α) * ta[1] + α * tb[1]]);
+
+            if (α == 1) {
+                clipangle(90);
+            } else if (α == 0) {
+                clipangle(null);
+            } else {
+                clipangle(null);
+            }
+            return projection;
+        };
+        projection.invert=function(x,y){
+            var ρ = Math.sqrt(x * x + y * y),
+                    c = Math.asin(ρ),
+                    sinc = Math.sin(c),
+                    cosc = Math.cos(c);
+            return [
+                Math.atan2(x * sinc, ρ * cosc),
+                Math.asin(ρ && y * sinc / ρ)
+            ];
+        }
+        delete projection.center;
+        return projection.alpha(0);
+    }
+
+    function spanWrap(content, classes) {
+        // Returns the content wrapped in the span
+        return '<span class="' + (classes ? classes.join(" ") : "") + '">' +
+                content + '</span>'
+    }
+    function flagTag(iso) {
+        return '<span class="flag ' + iso.toLowerCase() + '"></span>';
+    }
+    function dist(x1, y1, x2, y2) {
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
+    function rgbaString(c, a) {
+        if (isNumber(c.r)) {
+            return "rgba(" + c.r + "," + c.g + "," + c.b + "," + a + ")";
+        } else {
+            var reg = /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/;
+            var sColor = c.toLowerCase();
+            if (sColor && reg.test(sColor)) {
+                if (sColor.length === 4) {
+                    var sColorNew = "#";
+                    for (var i = 1; i < 4; i += 1) {
+                        sColorNew += sColor.slice(i, i + 1).concat(sColor.slice(i, i + 1));
+                    }
+                    sColor = sColorNew;
+                }
+                //处理六位的颜色值
+                var sColorChange = [];
+                for (var i = 1; i < 7; i += 2) {
+                    sColorChange.push(parseInt("0x" + sColor.slice(i, i + 2)));
+                }
+                return "rgba(" + sColorChange.join(",") + "," + a + ")";
+            } else {
+                return sColor;
+            }
+        }
+    }
+
+    function launchFullscreen(element) {
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+       
+    }
+    function exitFullscreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }else if(document.msExitFullscreen){
+            document.msExitFullscreen();
+        }
+    }
+    function switchFullscreen(element) {
+        var fullscreenEnabled = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement||document.msFullscreenElement;
+        if (fullscreenEnabled) {
+            exitFullscreen();
+        } else {
+            launchFullscreen(element);
+            resize();
+        }
+
+    }
+
+
+    var getID = (function () {
+        var i = 0;
+        return function () {
+            return i++;
+        }
+    })();
+
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+
+    var colorizer = d3.scale.category20();
+    var nodeModel = {
+        //configuration
+        linkSiblings: false,
+        linkAnchor: false,
+        target: true,
+        interval: 50,
+        pathLength: 10,
+        targetMaxAge: 200,
+        scaleTargetVel: d3.scale.log().domain([1, 40]).range([40, 100]),
+
+        ATTACKS: "attacks",
+        TARGETS: "targets",
+        ANCHORS: "anchors",
+
+        lastPurne: new Date().getTime() / 1000,
+
+        nodes: undefined,
+        links: undefined,
+
+        force: d3.layout.force()
+                .size([width, height])
+                .friction(0.25)
+                .gravity(0)
+                .charge(-10)
+                .linkDistance(15)
+                .linkStrength(function (d) {
+                    return d.linkStrength || 0.5;
+                }),
+
+        prune: function () {
+            var now = new Date().getTime() / 1000;
+            if (now - this.lastPurne > 10) {
+                this.lastPurne = now;
+                for (var i in this.nodes) {
+                    if (this.nodes[i].pruneTS > now) {
+                        if (i > 0) {
+                            this.nodes.splice(0, i);
+                        }
+                        break;
+                    }
+                }
+                for (var i in this.links) {
+                    if (this.links[i].pruneTS > now) {
+                        if (i > 0) {
+                            this.links.splice(0, i);
+                        }
+                        break;
+                    }
+                }
+            }
+        },
+        get: function (type) {
+            return this.nodes.filter(function (n) {
+                return n.type === type;
+            });
+        },
+
+        _mapKey: function (d) {
+            return d.city + d.fromLatitude + d.fromLongitude;
+        },
+        _remove: function (n, j) {
+            for (var i = 0; i < this.links.length; i++) {
+                if (this.links[i].source.id === n.id || this.links[i].target.id === n.id) {
+                    this.links.splice(i--, 1);
+                }
+            }
+            if (typeof j !== 'undefined')
+                this.nodes.splice(j, 1);
+
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (n.id === this.nodes[i].id) {
+                    this.nodes.splice(i--, 1);
+                }
+            }
+        },
+
+        _shift: function (type) {
+            for (var i = 0; i < this.nodes.length; i++) {
+                if (this.nodes[i].type === type) {
+                    this._remove(this.nodes[i], i);
+                    break;
+                }
+            }
+        },
+        _getsertAnchorFor: function (attack) {
+            // Get the anchor for the given node, inserting it if its not present
+            var key = this._mapKey(attack),
+                    anchor = this.nodes.filter(function (n) {
+                        return n.key === key;
+                    })[0];
+
+            if (anchor) {
+                return anchor;
+            } else {
+                var newAnchor = {
+                    id: getID(),
+                    key: key,
+                    type: this.ANCHORS,
+                    fromLongitude: attack.fromLongitude,
+                    fromLatitude: attack.fromLatitude,
+                    targetLongitude: attack.targetLongitude,
+                    targetLatitude: attack.targetLatitude,
+                    country: attack.country,
+                    city: attack.city,
+                    fixed: true,
+                    pruneTS: (new Date()).getTime() / 1000 + settings.dataPruneInterval
+                };
+                this.nodes.push(newAnchor);
+                return newAnchor;
+            }
+        },
+        pushAttack: function (attack) {
+            while (this.get(this.ATTACKS).length > 100) {
+                this._shift(this.ATTACKS);
+            }
+            //add links
+            if (this.linkSiblings) {
+                var key = this._mapKey(attack),
+                        that = this;
+                this.nodes.forEach(function (n) {
+                    if (that._mapKey(n) === key) {
+                        that.links.push({
+                            source: n,
+                            target: attack,
+                            pruneTS: (new Date()).getTime() / 1000 + settings.dataPruneInterval,
+                            linkStrength: n.dport === attack.dport ? 0.5 : 0.25
+                        });
+                    }
+                });
+            }
+
+            var anchor = this._getsertAnchorFor(attack);//add anchor
+            if (this.linkAnchor) {
+                this.links.push({
+                    source: anchor,
+                    target: attack,
+                    linkStrength: 1.0
+                });
+            }
+
+            //add target nodes
+            if (this.target) {
+
+                var target = {
+                    type: this.TARGETS,
+                    age: 0,
+                    path: [],
+                    h: dist(attack.x, attack.y, attack.targetX, attack.targetY),
+                    id: getID(),
+                    fromLongitude: attack.fromLongitude,
+                    fromLatitude: attack.fromLatitude,
+                    targetLongitude: attack.targetLongitude,
+                    targetLatitude: attack.targetLatitude,
+                    md5:attack.md5,
+                    x: attack.x,
+                    y: attack.y,
+                    cx: attack.targetX,
+                    cy: attack.targetY,
+                    startX: attack.x,
+                    startY: attack.y,
+                    city: attack.city2,
+                    country: attack.country2,
+                    theta: Math.atan((attack.targetY - attack.y) / (attack.targetX - attack.x)),
+                    dport: attack.dport,
+                    pruneTS: (new Date()).getTime() / 1000 + settings.dataPruneInterval,
+                    speed: 1 + Math.random() * 2,
+                    lineWidth: 1 + Math.random() * 2
+                };
+                this.nodes.push(target);
+            }
+
+            attack.type = this.ATTACKS;
+            attack.age = 0;
+            attack.randomSeed=(new Date()).getTime() / 1000+Math.random()*Math.PI*1000;
+            this.nodes.push(attack);
+            this.force.start();
+
+        },
+        step: function () {
+            this.nodes.forEach(function (n) {
+                n.age++;
+            });
+            this.get(this.TARGETS)
+                    .filter(function (t) {
+                        return t.age > this.targetMaxAge ||
+                                "arrivalAge" in t && t["arrivalAge"] + 40 < t.age;
+                    }, this)
+                    .forEach(function (t) {
+                        this._remove(t);
+                    }, this);
+
+        },
+        start: function () {
+            var that = this;
+            this.nodes = [];
+            this.links = [];
+            this.force.nodes(this.nodes).links(this.links).on("tick", (function () {
+                return function (e) {
+                    that.step();
+                    that.get(that.ATTACKS).forEach(function (d) {
+                        var scale = 0.1;
+                        d.x += scale * (d.cx - d.x) * e.alpha;
+                        d.y += scale * (d.cy - d.y) * e.alpha;
+                    });
+                    that.get(that.TARGETS).forEach(function (d) {
+                        d.path.unshift({
+                            x: d.x,
+                            y: d.y
+                        });
+                        if (d.path.length > that.pathLength)
+                            d.path.pop();
+                        if (d.arrivalAge) {
+                            d.fixed = true;
+                        } else {
+                            var v = that.scaleTargetVel(d.age) * e.alpha * d.speed,
+                                    toTarget = dist(d.cx, d.cy, d.x, d.y);
+                            if (v < toTarget) {
+                                var theta = Math.atan2(d.cy - d.y, d.cx - d.x);
+                                d.x += v * Math.cos(theta);
+                                d.y += v * Math.sin(theta);
+                            } else {
+                                d.x = d.cx;
+                                d.y = d.cy;
+                                d.arrivalAge = d.age;
+                            }
+                        }
+                    });
+                    that.force.resume();
+                }
+            })()).start();
+            d3.timer(this.force.resume);
+        }
+
+    };
+
+    var LinksModel = {
+        _locs: {},
+        insertLink: function (origin, target, port) {
+            if (!(origin.country in this._links)) {
+                this._links[origin.country] = {};
+            }
+            if (!(origin.city in this._links[origin.country])) {
+                this._links[origin.country][origin.city] = {};
+            }
+            var originLinks = this._links[origin.country][origin.city];
+            if (!(target.country in originLinks)) {
+                originLinks[target.country] = {};
+            }
+            if (!(target.city in originLinks[target.country])) {
+                originLinks[target.country][target.city] = {};
+            }
+            var targetLinks = originLinks[target.country][target.city];
+            if (!(port in targetLinks)) {
+                targetLinks[port] = 1;
+            } else {
+                targetLinks[port] = targetLinks[port] + 1;
+            }
+        },
+
+        removeLink: function (origin, target, port) {
+            var link1 = this._links[origin.country];
+
+            if (!link1) return;
+
+            var link2 = this._links[origin.country][origin.city];
+
+            if (!link2) return;
+
+            var target1 = link2[target.country];
+
+            if (!target1) return;
+
+            var target2 = link2[target.country][target.city];
+
+            if (!target2) return;
+
+            if (target2[port] > 1) {
+                target2[port]--;
+            } else if (target2[port] !== undefined) {
+                delete target2[port];
+            }
+        },
+
+        insertLoc: function (loc) {
+            if (!(loc.country in this._locs)) {
+                this._locs[loc.country] = {};
+            }
+            if (!(loc.city in this._locs)) {
+                this._locs[loc.country][loc.city] = {
+                    longitude: loc.longitude,
+                    latitude: loc.latitude,
+                    ip: loc.ip
+                };
+            }
+        },
+
+        removeLoc: function (loc, origin, target, port) {
+            var link1 = this._links[origin.country];
+
+            if (!link1) return;
+
+            var link2 = this._links[origin.country][origin.city];
+
+            if (!link2) return;
+
+            var target1 = link2[target.country];
+
+            if (!target1) return;
+
+            var target2 = link2[target.country][target.city];
+
+            if (!target2)  return;
+
+            if (!target2[port]) {
+                delete this._links[origin.country][origin.city];
+                delete this._locs[loc.country][loc.city]
+            }
+        },
+
+        _distanceBetween: function (pt1, pt2) {
+            return Math.sqrt(Math.pow(pt1[0] - pt2[0], 2) + Math.pow(pt1[1] - pt2[1], 2));
+        },
+        getCity: function (country, city) {
+            if (country in this._locs && city in this._locs[country]) {
+                var loc = this._locs[country][city],
+                        info = {
+                            country: country,
+                            city: city,
+                            latitude: loc.latitude,
+                            longitude: loc.longitude,
+                            ip: loc.ip
+                        };
+                if (country in this._links && city in this._links[country]) {
+                    info.counts = this._links[country][city];
+                }
+                return info;
+            }
+        },
+        getCities: function () {
+            var cities = [];
+            for (var country in this._locs) {
+                for (var city in this._locs[country]) {
+                    cities.push(this.getCity(country, city));
+                }
+            }
+            return cities;
+        },
+        getCountry: function (country) {
+            var cities = [];
+            for (var city in this._links[country] || {}) {
+                cities.push(this.getCity(country, city));
+            }
+            return cities;
+        },
+
+        pixelsFromNearest: function (pt) {
+            var closest;
+            for (var country in this._links) {
+                for (var city in this._links[country]) {
+                    var info = this.getCity(country, city);
+                    if (info) {
+                        var infopt = geoToPixel(info.longitude, info.latitude);
+                        if (!infopt.x) {
+                            infopt = {x: -999, y: -999}
+                        }
+                        var distance = this._distanceBetween(pt, [infopt.x, infopt.y]);
+                        if (distance) {
+                            if (!closest || distance < closest.distance) {
+                                info.distance = distance;
+                                closest = info;
+                            }
+                        }
+                    }
+                }
+            }
+            return closest;
+        },
+
+        total: function (counts) {
+            if (isNumber(counts)) {
+                return counts;
+            } else {
+                var sum = 0;
+                for (var key in counts) {
+                    sum += this.total(counts[key]);
+                }
+                return sum;
+            }
+        },
+        extend: function (o) {
+            o.__proto__ = this;
+            o._links = {};
+            return o;
+        }
+    };
+
+    var linkModels = {
+        origins: LinksModel.extend({
+            insert: function (d) {
+                this.insertLink(
+                        {country: d.country, city: d.city},
+                        {country: d.country2, city: d.city2},
+                        d.dport);
+
+                this.insertLoc(
+                        {
+                            country: d.country,
+                            city: d.city,
+                            longitude: d.fromLongitude,
+                            latitude: d.fromLatitude,
+                            ip: d.md5
+                        });
+            },
+            remove: function (d) {
+                this.removeLink(
+                        {country: d.country, city: d.city},
+                        {country: d.country2, city: d.city2},
+                        d.dport);
+
+                this.removeLoc(
+                        {
+                            country: d.country,
+                            city: d.city,
+                            longitude: d.longitude,
+                            latitude: d.latitude
+                        },
+                        {country: d.country, city: d.city},
+                        {country: d.country2, city: d.city2},
+                        d.dport);
+            }
+        }),
+
+        targets: LinksModel.extend({
+            insert: function (d) {
+                this.insertLink(
+                        {country: d.country2, city: d.city2},
+                        {country: d.country, city: d.city},
+                        d.dport);
+
+                this.insertLoc(
+                        {
+                            country: d.country2,
+                            city: d.city2,
+                            longitude: d.targetLongitude,
+                            latitude: d.targetLatitude,
+                            ip: d.dest_ip
+                        });
+            },
+            remove: function (d) {
+                this.removeLink(
+                        {country: d.country2, city: d.city2},
+                        {country: d.country, city: d.city},
+                        d.dport);
+
+                this.removeLoc(
+                        {
+                            country: d.country2,
+                            city: d.city2,
+                            longitude: d.targetLongitude,
+                            latitude: d.targetLatitude
+                        },
+                        {country: d.country2, city: d.city2},
+                        {country: d.country, city: d.city},
+                        d.dport);
+            }
+        })
+    };
+
+    var countryModel = {
+        _raw: undefined,
+        _iso2: undefined,
+        _iso3: undefined,
+        _countries: undefined,
+
+        push: function (country) {
+            // Push a new country
+            this._raw.push(country);
+            if (country.iso2) this._iso2[country.iso2] = country;
+            if (country.iso3) this._iso3[country.iso3] = country;
+            if (country.country) this._countries[country.country] = country;
+        },
+
+        set: function (raw) {
+            this._raw = [];
+            this._iso2 = {};
+            this._iso3 = {};
+            this._countries = {};
+            for (var i = 0; i < raw.length; i++) {
+                this.push(raw[i]);
+            }
+        },
+
+        getByIso2: function (iso2) {
+            return this._iso2[iso2.toUpperCase()];
+        },
+
+        getByIso3: function (iso3) {
+            return this._iso3[iso3.toUpperCase()];
+        },
+
+        getByCountry: function (country) {
+            return this._countries[country];
+        }
+    };
+
+    var land, boundaries, graticule = d3.geo.graticule()();
+
+    var logScale = d3.scale.log().domain([1, 200]).range([1, 10]);
+    var lineScale = function (x) {
+        return logScale(x);
+    };
+    var circleScale = function (x) {
+        return Math.ceil(0.14 * 5 * logScale(x))
+    };
+    var colorScale = (function () {
+        var log = d3.scale.log().domain([1, 600]).range([1, 100]);
+        return function (v) {
+            return log(v);
+        }
+    })();
+    var geoToPixel = function (longitude, latitude) {
+        var pt = canvasPath.centroid({type: "Point", coordinates: [longitude, latitude]});
+        return {x: pt[0], y: pt[1]};
+    };
+
+    var painter = {
+        drawings: {
+            pings: {
+                active: settings.pings,
+                order: -1,
+                duration: 80,
+                scaleRadius: d3.scale.linear().domain([1, 80]).range([1, 48]),
+                scaleOpacity: d3.scale.linear().domain([1, 80]).range([1, 0]),
+                draw: function (context) {
+                    for (var i = 0; i < nodeModel.nodes.length; i++) {
+                        var n = nodeModel.nodes[i];
+                        if (n.type === nodeModel.ATTACKS && n.age < this.duration) {
+                            context.globalAlpha = this.scaleOpacity(n.age);
+                            context.strokeStyle = colorizer(n.md5);
+                            context.lineWidth = 2;
+                            var circle;
+                            context.beginPath();
+                            if (isSphere) {
+                                circle = d3.geo.circle().origin([n.fromLongitude, n.fromLatitude])
+                                        .angle(n.age / this.duration * 5 / projection.scale())();
+                                canvasPath.context(context)(circle);
+                            } else {
+                                var pt = geoToPixel(n.fromLongitude, n.fromLatitude);
+                                context.arc(pt.x, pt.y, this.scaleRadius(n.age) / projection.scale(), 0, 2 * Math.PI);
+                            }
+                            context.stroke();
+                        }
+                    }
+                }
+            },
+            origins: {
+                active: settings.origins,
+                order: -2,
+                draw: function (context) {
+                    context.globalAlpha = 0.5;
+                    context.fillStyle = "#ff0";
+					context.font="10px Times New Roman";
+					 
+                    var cities = linkModels.origins.getCities();
+                    for (var i = 0; i < cities.length; i++) {
+                        var total = linkModels.origins.total(cities[i].counts),
+                                r = circleScale(total);
+                        var point0 = {"type": "Point", "coordinates": [cities[i].longitude, cities[i].latitude]};
+                        context.beginPath();
+                        canvasPath.context(context).pointRadius(r)(point0);
+                        context.fill();
+                        
+                        var loc = projection([cities[i].longitude, cities[i].latitude]);
+                        var p_city = cities[i].city != 'null' ? cities[i].city : countryModel.getByIso2(cities[i].country).country;
+                        context.fillText(p_city, loc[0]-30, loc[1]+20);
+                    }
+                }
+            },
+            targets: {
+                active: settings.targets,
+                order: -2,
+                draw: function (context) {
+                    context.globalAlpha = 0.65;
+                    context.strokeStyle = "#fff";
+                    context.fillStyle = "#fff";
+                    var cities = linkModels.targets.getCities();
+                    for (var i = 0; i < cities.length; i++) {
+                        var total = linkModels.targets.total(cities[i].counts),
+                                r = circleScale(total);
+                        var point0 = {"type": "Point", "coordinates": [cities[i].longitude, cities[i].latitude]};
+                        context.beginPath();
+                        canvasPath.context(context).pointRadius(r)(point0);
+                        context.fill();
+
+                        var centerPt = geoToPixel(cities[i].longitude, cities[i].latitude);
+                        if (centerPt.x && centerPt.y) {
+                            context.fillRect(centerPt.x - 1, centerPt.y - 1, 2, 2);
+                        }
+
+                    }
+                }
+            },
+
+            greatArcs: {
+                active: settings.greatArcs,
+                impactRadiusScale: d3.scale.linear().domain([1, 40]).range([1, 30]),
+                impactOpacityScale: d3.scale.linear().domain([1, 40]).range([1, 0]),
+                impactWidth: 1,
+                tempSphere:d3.geo.orthographic()
+                        .clipAngle(90)
+                        .scale(height / 2.5)
+                        .translate([width / 2, height / 2])
+                        .rotate([0, 0, 0]),
+                flying_arc:function(pts){
+                    var source=pts.source,
+                            target=pts.target;
+                    var mid=this.location_along_arc(source,target,.5);
+                    var result=[projection(source),sky(mid),projection(target)];
+                    return result;
+                },
+                location_along_arc:function(start,end,loc){
+                    var interpolator = d3.geo.interpolate(start,end);
+                    return interpolator(loc);
+                },
+                swoosh:d3.svg.line()
+                        .x(function(d){return d[0]})
+                        .y(function(d){return d[1]})
+                        .interpolate("cardinal")
+                        .tension(.0),
+                fade_at_edge:function(d){
+                    var centerPos = this.tempSphere.invert([width/2,height/2]),
+                            arc = d3.geo.greatArc(),
+                            start, end;
+                    // function is called on 2 different data structures..
+                    if (d.source) {
+                        start = d.source,
+                                end = d.target;
+                    }
+                    else {
+                        start = d.geometry.coordinates[0];
+                        end = d.geometry.coordinates[1];
+                    }
+
+                    var start_dist = 1.57 - arc.distance({source: start, target: centerPos}),
+                            end_dist = 1.57 - arc.distance({source: end, target: centerPos});
+
+                    var fade = d3.scale.linear().domain([-.1,0]).range([0,.1])
+                    var dist = start_dist < end_dist ? start_dist : end_dist;
+
+                    return fade(dist)
+                },
+
+
+                draw: function (context) {
+
+                    context.lineWidth = 2;
+                    var pi = Math.PI;
+                    var that = this;
+
+                    if (isSphere) {
+                        sky.scale(projection.scale()*(settings.skyHeight||1.2)).rotate(projection.rotate()).translate(projection.translate());
+                        that.tempSphere.scale(height/2.5*projection.scale()).rotate(projection.rotate()).translate(projection.translate());
+
+                        var links=[];
+                        nodeModel.get(nodeModel.ATTACKS)
+                                .forEach(function(d){
+                                    links.push({
+                                        source: [d.fromLongitude, d.fromLatitude],
+                                        target:[d.targetLongitude, d.targetLatitude],
+                                        fromIP: d.md5,
+//                                        pruneTs:d.pruneTS+Math.random()*Math.PI*1000,
+                                        pruneTs:d.randomSeed
+                                    })
+                                });
+                        links.forEach(function(d){
+                            var c=d3.rgb(colorizer(d.fromIP));
+                            var factor=Math.sin(Math.abs((new Date()).getTime()- d.pruneTs)/1000);
+                            var opacity=that.fade_at_edge(d)*Math.abs(factor);
+                            context.strokeStyle= rgbaString(c,opacity);
+                            var link=that.flying_arc(d);
+                            context.beginPath();
+                            context.moveTo(link[0][0],link[0][1]);
+                            context.quadraticCurveTo(link[1][0],link[1][1],link[2][0],link[2][1]);
+                            context.stroke();
+                        });
+                    }
+                    else {
+                        nodeModel.get(nodeModel.TARGETS)
+                                .forEach(function (target) {
+                                    var c = d3.rgb(colorizer(target.md5));
+                                    context.strokeStyle = c.toString();
+
+                                    var afterArrival = target.age - target["arrivalAge"];
+                                    r = 10;
+                                    if ("arrivalAge" in target) {
+                                        var r = that.impactRadiusScale(afterArrival);
+                                        context.save();
+                                        context.globalAlpha = that.impactOpacityScale(afterArrival);
+                                        context.lineWidth = that.impactWidth;
+                                        context.beginPath();
+                                        context.arc(target.x, target.y, r, 0, 2 * pi);
+                                        context.closePath();
+                                        context.stroke();
+                                        context.restore();
+                                    }
+                                    if (target.path.length > 0) {
+                                        var point = target.path[target.path.length - 1];
+                                        if (target.x != point.x && target.y != point.y) {
+                                            context.save();
+                                            var grd = context.createLinearGradient(
+                                                    target.x, target.y, point.x, point.y);
+                                            grd.addColorStop(0, rgbaString(c, 1));
+                                            grd.addColorStop(1, rgbaString(c, 0));
+                                            context.lineCap = "round";
+                                            context.lineWidth = target.lineWidth;
+                                            context.beginPath();
+                                            context.moveTo(target.x, target.y);
+                                            context.strokeStyle = grd;
+                                            context.lineTo(point.x, point.y);
+                                            context.closePath();
+                                            context.stroke();
+                                            context.restore();
+                                        }
+                                    }
+                                })
+                    }
+                }
+            }
+        },
+        _activeCanvas: {
+            canvas: canvas,
+            context: canvas.node().getContext("2d")
+        },
+
+        _clearContext: function (context) {
+            context.save();
+            context.clearRect(0, 0, width, height);
+            context.restore();
+        },
+        redraw: function () {
+            if (!pause) {
+                var t = Date.now() - t0;
+                rotate[0] = initial[0] + velocity[0] * t;
+                rotate[1] = initial[1] + velocity[1] * t;
+                projection.rotate(rotate);
+                if (!isSphere) {
+                    switchPause();
+                }
+            }
+            svg.selectAll("path")
+                    .attr("d", path);
+            PlaceText();
+
+
+            this.drawStart = new Date().getTime();
+            this._clearContext(this._activeCanvas.context);
+            for (var drawing in this.drawings) {
+                if (this.drawings[drawing].active)
+                    this.drawings[drawing].draw(this._activeCanvas.context);
+            }
+            var that = this;
+            var nextFrame = 1000 / 50 - (new Date().getTime() - this.drawStart);
+            if (nextFrame < 0) nextFrame = 0;
+            this._timeout = setTimeout(function () {
+                that.redraw()
+            }, nextFrame);
+
+        },
+        start: function () {
+            this.redraw();
+        },
+        stop: function () {
+            clearTimeout(this._timeout);
+        }
+
+    };
+
+    var _ = (function () {
+        var previous;
+
+        function cityKey(n) {
+            return [n.country, n.city];
+        }
+
+        canvas.on("mousemove", function () {
+            // TODO -- this is a hacky mess
+            var nearestOrigin = linkModels.origins.pixelsFromNearest(d3.mouse(this));
+            var nearestTarget = linkModels.targets.pixelsFromNearest(d3.mouse(this));
+            var nearest, msg;
+            if (nearestOrigin || nearestTarget) {
+                if (!nearestOrigin || nearestTarget.distance <= nearestOrigin.distance) {
+                    nearest = nearestTarget;
+                    nearest.type = "target";
+                    msg = "攻击目标: ";
+                }
+                if (!nearestTarget || nearestOrigin.distance < nearestTarget.distance) {
+                    nearest = nearestOrigin;
+                    nearest.type = "origin";
+                    msg = "攻击来源: ";
+                }
+            }
+
+            if (nearest && nearest.distance < 20) {
+                var key = cityKey(nearest);
+                if (key !== previous) {
+                    displayLabel.set(msg +
+                            (nearest.city === "" ? "<unknown>" : nearest.city)
+                            + ", " + countryModel.getByIso2(nearest.country).country, d3.mouse(this));
+                }
+               
+                if (nearest.type == "origin" && nearest.ip) {
+                    canvas.on("click", function () {
+                        layer.open({
+                            type: 2,
+                            title: '攻击源详情',
+                            shadeClose: true,
+                            shade: 0.8,
+                            area: ['800px', '90%'],
+                            content: '../../../earth.php?do=sinfo&ip='+nearest.ip+'&rnd=' + Math.random()
+                        });
+                    })
+                } else if (nearest.type == "target" && nearest.ip) {
+                    canvas.on("click", function () {
+                        layer.open({
+                            type: 2,
+                            title: '攻击目标详情',
+                            shadeClose: true,
+                            shade: 0.8,
+                            area: ['1366px', '700px'],
+                            content: '../../../earth.php?do=dinfo&ip='+nearest.ip+'&rnd=' + Math.random()
+                        });
+                    })
+                }
+				
+            } else {
+                canvas.on("click", null);
+                previous = key;
+                displayLabel.clear();
+            }
+        });
+    })();
+    function PlaceText() {
+        if (pause || !isSphere) {
+            worldData.forEach(function (d) {
+                svg.select("#" + d.properties.ISO_A2)
+                        .attr("transform", function (d) {
+                            var area = path.area(d.geometry);
+                            if (area > 5000) {
+                                var ct = path.centroid(d.geometry);
+                                if (isFinite(ct[0])) {
+                                    return "translate(" + path.centroid(d.geometry) + ")";
+                                } else {
+                                    return "translate(-20,-20)";
+                                }
+                            }
+                            return "translate(-20,-20)";
+                        });
+            });
+        }
+        else {
+            svg.selectAll("text")
+                    .attr("transform", "translate(-20,-20)");
+        }
+    }
+
+    function Stats(params) {
+        this.state = params.state || d3.map();
+        this.elt = params.elt || d3.select("body");
+        this.tag = params.tag || "div";
+
+        this.insert = function (incoming) {
+            // Insert a new item, updating the state. params.insert should mutate
+            params.insert(incoming, this.state);
+        };
+
+        this.data = function () {
+            // Get the data as a list
+            if (params.data) return params.data(this.state); else this.state;
+        };
+
+        this.redraw = function () {
+            if (params.redraw) {
+                params.redraw()
+            } else {
+                this.elt.selectAll(this.tag)
+                        .data(this.data())
+                        .enter().append(this.tag)
+                        .text(function (d) {
+                            return d
+                        });
+            }
+        }
+    }
+
+    var statsManager = {
+        insert: function (incoming) {
+            if (incoming.data_type == "new" || true) {
+                for (var i = 0; i < this.stats.length; ++i) {
+                    this.stats[i].insert(incoming);
+                }
+            }
+        },
+
+        redraw: function () {
+            for (var i = 0; i < this.stats.length; i++) {
+                this.stats[i].redraw();
+            }
+        },
+        //统计信息
+        stats: [
+            // 攻击源
+            new Stats({
+                state: d3.map(),
+
+                insert: function (incoming, state) {
+                    this.updated = incoming.country;
+                    if (state.has(incoming.country)) {
+                        state.set(incoming.country,
+                                state.get(incoming.country) + 1);
+                    } else {
+                        state.set(incoming.country, 1);
+                    }
+                },
+
+                redraw: function () {
+                    var data = this.state.entries()
+                                    .sort(function (d1, d2) {
+                                        return d2.value - d1.value;
+                                    })
+                                    .slice(0, settings.topTableRows),
+                            updated = this.updated;
+
+                    var rows = d3.select("#left-data").selectAll("tr.row")
+                            .data(data, function (d) {
+                                return d.key;
+                            });
+                    rows.enter()
+                            .append("tr")
+                            .attr("class", "row");
+                    rows.sort(function (d1, d2) {
+                        return d2.value - d1.value;
+                    });
+                    rows.exit().remove();
+
+                    rows.filter(function (d) {
+                        return d.key == updated
+                    })
+                            .style("color", settings.triggerColor)
+                            .transition()
+                            .duration(1000)
+                            .style("color", "white");
+
+                    var cols = rows.selectAll("td")
+                            .data(function (d) {
+                                var country = countryModel.getByIso2(d.key);
+                                return [
+                                    '<div class="bar" style="width: ' +
+                                    settings.tableBarWidth(d.value + 1) + '"></div>',
+                                    spanWrap(d.value, ["numeric"]),
+                                    flagTag(d.key),
+                                    (country ? country.country : d.key)];
+                            });
+                    cols.enter().append("td");
+                    cols.html(function (d) {
+                        return d;
+                    });
+                    cols.exit().remove();
+                }
+            }),
+            //端口
+            new Stats({
+                state: d3.map([], function (d) {
+                    return d.type;
+                }),
+
+                insert: function (incoming) {
+                    this.updated = incoming.service;
+                    var key = incoming.service;
+                    if (this.state.has(key)) {
+                        this.state.set(key,
+                                this.state.get(key) + 1);
+                    } else {
+                        this.state.set(key, 1);
+                    }
+                },
+
+                redraw: function () {
+                    var data = this.state.entries()
+                                    .sort(function (d1, d2) {
+                                        return d2.value - d1.value;
+                                    })
+                                    .slice(0, settings.portTableRows),
+                            updated = this.updated;
+
+                    var rows = d3.select("#bottom-right-data").selectAll("tr.row")
+                            .data(data, function (d, i) {
+                                return d ? d.key : i;
+                            });
+                    rows.enter()
+                            .append("tr")
+                            .attr("class", "row");
+                    rows.sort(function (d1, d2) {
+                        return d2.value - d1.value;
+                    });
+                    rows.exit().remove();
+
+                    rows.filter(function (d) {
+                        return d.key == updated
+                    })
+                            .style("color", function (d) {
+                                return colorizer(d.key);
+                            })
+                            .transition()
+                            .duration(1000)
+                            .style("color", "white");
+
+                    var cols = rows.selectAll("td")
+                            .data(function (d) {
+                                return [
+                                    '<div class="bar" style="width: ' +
+                                    settings.tableBarWidth(d.value + 1) + '"></div>',
+                                    spanWrap(d.value, ["numeric"]),
+                                    '<span class="port-circle" style="color:' + colorizer(d.key) +
+                                    '">●</span>',
+                                    d.key ? d.key : "unknown"
+                                ];
+                            });
+                    cols.enter().append("td");
+                    cols.html(function (d) {
+                        return d;
+                    });
+                    cols.exit().remove();
+                }
+            }),
+
+            //实时攻击
+            new Stats({
+                state: [],
+
+                insert: function (incoming, state) {
+                    state.push(incoming);
+                    while (state.length > settings.consoleTableRows) {
+                        state.shift();
+                    }
+                    return state;
+                },
+
+                redraw: function () {
+                    var rows = d3.select("#events-data").selectAll("tr.row")
+                            .data(this.state, function (d) {
+                                return d.id;
+                            });
+
+                    rows.enter().append("tr")
+                            .style("color", function (d) {
+                                return colorizer(d.md5);
+                            })
+                            .attr("class", "row");
+                    rows.sort(function (d1, d2) {
+                        return d2.id - d1.id;
+                    });
+                    rows.exit().remove();
+                    var cols = rows.selectAll("td")
+                            .data(function (d) {
+                                return [
+                                    d.datetime,
+//                                    spanWrap(d.org, ["org", "overflow"]),
+                                    spanWrap(
+                                            (d.city === "" ? "unknown" : d.city) + ", " +
+                                            countryModel.getByIso2(d.country).country,
+                                            ["location", "overflow"]),
+                                    d.md5,
+                                    spanWrap(
+                                            (d.city2 === "" ? "unknown" : d.city2) + ", " +
+                                            countryModel.getByIso2(d.country2).country,
+                                            ["location", "overflow", "numeric"]),
+                                    spanWrap(d.service || "unknown",
+                                            ["service", "overflow"]),
+                                    spanWrap(d.dport, ["numeric"])];
+                            });
+                    cols.enter().append("td")
+                            .html(function (d) {
+                                return d;
+                            });
+                    cols.exit().remove();
+                }
+
+            })
+        ]
+    };
+
+
+    var wsDiscTime = 0;
+    
+    // http请求数据模式
+    var earth_data_time = 10;   
+    function startHTTP () {
+    	startHTTPData();
+    	setInterval("startHTTPData();", earth_data_time * 1000);
+    }
+    function startHTTPData () {
+    	var pauser = {
+            _buffer: [],
+            unbuffer: function () {
+                while (this._buffer.length > 0) {
+                    this.insert(this._buffer.shift());
+                }
+                statsManager.redraw();
+            },
+            insert: function (d) {
+                nodeModel.pushAttack(d);
+                statsManager.insert(d);
+                for (var model in linkModels) {
+                    linkModels[model].insert(d);
+                }
+
+
+                d.pruneTS = new Date().getTime() / 1000 + settings.pruneInterval;
+
+            },
+
+            push: function (d) {
+                if (this.paused()) {
+                    this._buffer.push(d);
+                } else {
+                    this.insert(d);
+                    statsManager.redraw();
+
+                }
+            },
+
+            paused: function () {
+            }
+        };
+
+        function loaddata() {
+            queue()
+            .defer(d3.json, "../../../earth.php?do=edata&emodel=model3")
+            .await(function (error, attacks) {
+                var i = 0;
+                var inter = null;
+                var count = attacks.length;
+                var tlen = (earth_data_time * 1000) / count;
+                function insertAttack() {
+                    var datum = attacks[i];
+                    i++;
+                    if (i > count) {
+                    	clearInterval(inter);
+                    	return;
+                    }
+                    if (datum.longitude == 0 && datum.latitude == 0) {
+                        datum.longitude = 2;
+                        datum.latitude = 46;
+                    }
+                    if (datum.error) {
+                        console.log("ERROR: " + datum.error.msg);
+                    }
+                    for (var prop in datum) {
+                        if (settings.numberProps.indexOf(prop) !== -1) {
+                            datum[prop] = Number(datum[prop]);
+                        }
+                    }
+                    function cleanCountry(country) {
+                        if (country === "USA") {
+                            return "US";
+                        }
+                        return country
+                    }
+                    datum.country = cleanCountry(datum.country);
+		            datum.country2 = cleanCountry(datum.country2);
+		            datum.service = datum.type ? datum.type : "unknown";
+		            datum.fromLongitude = datum.longitude;
+		            datum.fromLatitude = datum.latitude;
+		            datum.targetLongitude = datum.longitude2;
+		            datum.targetLatitude = datum.latitude2;
+		            var startLoc = isSphere ? flat([datum.fromLongitude, datum.fromLatitude]) : projection([datum.fromLongitude, datum.fromLatitude]);
+		            var endLoc = isSphere ? flat([datum.targetLongitude, datum.targetLatitude]) : projection([datum.targetLongitude, datum.targetLatitude]);
+		            datum.cx = startLoc[0];
+		            datum.cy = startLoc[1];
+		            datum.x = startLoc[0];
+		            datum.y = startLoc[1];
+		            datum.targetX = endLoc[0];
+		            datum.targetY = endLoc[1];
+		            delete datum.longitude;
+		            delete datum.latitude;
+		            delete datum.longitude2;
+		            delete datum.latitude2;
+		            datum.id = getID();
+		            var time = new Date();
+		            time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+		            datum.datetime = time.toISOString()
+		                    .replace("T", "&ensp;")
+		                    .slice(0, -5);
+		            pauser.push(datum);
+                }
+                inter = setInterval(insertAttack, tlen);
+            });
+        }
+
+        loaddata();
+    }
+    
+    function start_msg () {
+     
+    	$.post('../../../earth.php?do=edata', {}, function (ret) {
+    		if (ret) {
+    			var arr = eval("(" + ret + ")");
+    			var len = arr.length;
+    			var tlen = 2000 / len;
+    			for (var i=0; i<len; i++) {
+    				var obj = arr[i];
+    				start_msg_1(obj);
+    				//setTimeout(function(){start_msg_1(obj)}, tlen*i);
+    			}
+    		}	
+    	});
+    }
+    
+    
+    // websocket模式
+    function start(loc, psk) {
+        var webSocket = new WebSocket(loc || settings.wsHost);
+        var pauser = {
+            _buffer: [],
+            unbuffer: function () {
+                while (this._buffer.length > 0) {
+                    this.insert(this._buffer.shift());
+                }
+                statsManager.redraw();
+            },
+            insert: function (d) {
+                nodeModel.pushAttack(d);
+                statsManager.insert(d);
+                for (var model in linkModels) {
+                    linkModels[model].insert(d);
+                }
+
+                d.pruneTS = new Date().getTime() / 1000 + settings.pruneInterval;
+
+            },
+
+            push: function (d) {
+                if (this.paused()) {
+                    this._buffer.push(d);
+                } else {
+                    this.insert(d);
+                    statsManager.redraw();
+
+                }
+            },
+
+            paused: function () {
+
+            }
+        };
+
+        webSocket.onopen = function () {
+            wsDiscTime = 0;
+            webSocket.send(psk || settings.psk);
+        };
+
+        webSocket.onmessage = function (evt) {
+            if (!evt) {
+                return;
+            }
+            var datum = eval("(" + evt.data + ")");
+
+            if (datum.longitude == 0 && datum.latitude == 0) {
+                datum.longitude = -5;
+                datum.latitude = -50;
+            }
+
+
+            if (datum.error) {
+                console.log("ERROR: " + datum.error.msg);
+            }
+
+            for (var prop in datum) {
+                if (settings.numberProps.indexOf(prop) !== -1) {
+                    datum[prop] = Number(datum[prop]);
+                }
+            }
+
+            function cleanCountry(country) {
+                // Clean incoming country code
+                if (country === "USA") {
+                    return "US";
+                }
+                return country
+            }
+
+            datum.country = cleanCountry(datum.country);
+            datum.country2 = cleanCountry(datum.country2);
+
+            datum.service = datum.type ? datum.type : "unknown";
+
+            datum.fromLongitude = datum.longitude;
+            datum.fromLatitude = datum.latitude;
+            datum.targetLongitude = datum.longitude2;
+            datum.targetLatitude = datum.latitude2;
+            var startLoc = isSphere ? flat([datum.fromLongitude, datum.fromLatitude]) : projection([datum.fromLongitude, datum.fromLatitude]);
+            var endLoc = isSphere ? flat([datum.targetLongitude, datum.targetLatitude]) : projection([datum.targetLongitude, datum.targetLatitude]);
+            datum.cx = startLoc[0];
+            datum.cy = startLoc[1];
+            datum.x = startLoc[0];
+            datum.y = startLoc[1];
+            datum.targetX = endLoc[0];
+            datum.targetY = endLoc[1];
+            delete datum.longitude;
+            delete datum.latitude;
+            delete datum.longitude2;
+            delete datum.latitude2;
+            datum.id = getID();
+            var time = new Date();
+            time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+            datum.datetime = time.toISOString()
+                    .replace("T", "&ensp;")
+                    .slice(0, -5);
+            pauser.push(datum);
+        };
+
+        webSocket.onclose = function () {
+            wsDiscTime += 500;
+        };
+        return webSocket;
+
+    }
+    
+    // demo模式
+    function startDEMO() {
+        var pauser = {
+            _buffer: [],
+            unbuffer: function () {
+                while (this._buffer.length > 0) {
+                    this.insert(this._buffer.shift());
+                }
+                statsManager.redraw();
+            },
+            insert: function (d) {
+                nodeModel.pushAttack(d);
+                statsManager.insert(d);
+                for (var model in linkModels) {
+                    linkModels[model].insert(d);
+                }
+
+
+                d.pruneTS = new Date().getTime() / 1000 + settings.pruneInterval;
+
+            },
+
+            push: function (d) {
+                if (this.paused()) {
+                    this._buffer.push(d);
+                } else {
+                    this.insert(d);
+                    statsManager.redraw();
+
+                }
+            },
+
+            paused: function () {
+            }
+        };
+
+        function loaddata() {
+            queue()
+            .defer(d3.json, "data/attacks.json")
+            .await(function (error, attacks) {
+                var i = 0;
+                var count = attacks.length;
+
+                function insertAttack() {
+
+                    var datum = attacks[i];
+                    i++;
+                    if (i == count - 1) i = 0;
+                    if (datum.longitude == 0 && datum.latitude == 0) {
+                        datum.longitude = 2;
+                        datum.latitude = 46;
+                    }
+                    if (datum.error) {
+                        console.log("ERROR: " + datum.error.msg);
+                    }
+                    for (var prop in datum) {
+                        if (settings.numberProps.indexOf(prop) !== -1) {
+                            datum[prop] = Number(datum[prop]);
+                        }
+                    }
+                    function cleanCountry(country) {
+                        // Clean incoming country code
+                        if (country === "USA") {
+                            return "US";
+                        }
+                        return country
+                    }
+                    datum.country = cleanCountry(datum.country);
+                    datum.city2 = "Chang Sha";
+                    datum.country2 = "CN";
+                    datum.dest_ip = "192.168.1.234";
+                    datum.data_type =Math.random()<0.5? "new":"old";
+                    var method = ["爬虫攻击扫描", "WEBSHELL", "数据库通用类", "WebShell通用类", "SQLServer注入", "敏感信息扫描", "本地包含漏洞(LFI字典型)"];
+                    datum.service = method[Math.floor(Math.random() * method.length)];
+                    datum.fromLongitude = datum.longitude;
+                    datum.fromLatitude = datum.latitude;
+                    datum.targetLongitude = 113.1136;
+                    datum.targetLatitude = 28.1792;
+                    var startLoc = isSphere ? flat([datum.fromLongitude, datum.fromLatitude]) : projection([datum.fromLongitude, datum.fromLatitude]);
+                    var endLoc = isSphere ? flat([datum.targetLongitude, datum.targetLatitude]) : projection([datum.targetLongitude, datum.targetLatitude]);
+                    datum.x = startLoc[0];
+                    datum.y = startLoc[1];
+                    datum.targetX = endLoc[0];
+                    datum.targetY = endLoc[1];
+
+                    datum.id = getID();
+                    var time = new Date();
+                    time.setMinutes(time.getMinutes() - time.getTimezoneOffset());
+                    datum.datetime = time.toISOString()
+                            .replace("T", "&ensp;")
+                            .slice(0, -5);
+
+                    pauser.push(datum);
+                }
+
+                setInterval(insertAttack, 200);
+            });
+        }
+
+        loaddata();
+    }
+
+
+    queue()
+        .defer(d3.csv, "data/country-codes.csv")
+        .defer(d3.json, "data/shape.json")
+        .await(function (error,countryCode, world) {
+            worldData = topojson.feature(world, world.objects.countries).features;
+            countryModel.set(countryCode);
+            countryModel.push({iso2: "O1", country: "Govment"});
+            var land = topojson.feature(world, world.objects.land);
+            var boundaries = topojson.mesh(world, world.objects.countries, function (a, b) {
+                return a !== b;
+            });
+
+
+            var mapCodes = {};
+            countryCode.forEach(function (d) {
+                mapCodes[Number(d.isonum)] = d.iso2;
+            });
+
+
+            var ocean_fill = svg.append("defs").append("radialGradient")
+                    .attr("id", "ocean_fill")
+                    .attr("cx", "75%")
+                    .attr("cy", "25%");
+            ocean_fill.append("stop").attr("offset", "5%").attr("stop-color", "#222");
+            ocean_fill.append("stop").attr("offset", "100%").attr("stop-color", "#000");
+
+            var globe_highlight = svg.append("defs").append("radialGradient")
+                    .attr("id", "globe_highlight")
+                    .attr("cx", "75%")
+                    .attr("cy", "25%");
+            globe_highlight.append("stop")
+                    .attr("offset", "5%").attr("stop-color", "#242cff")
+                    .attr("stop-opacity", "0.6");
+            globe_highlight.append("stop")
+                    .attr("offset", "100%").attr("stop-color", "#12155e")
+                    .attr("stop-opacity", "0.2");
+            var globe_shading = svg.append("defs").append("radialGradient")
+                    .attr("id", "globe_shading")
+                    .attr("cx", "55%")
+                    .attr("cy", "45%");
+            globe_shading.append("stop")
+                    .attr("offset", "30%").attr("stop-color", "#fff")
+                    .attr("stop-opacity", "0");
+            globe_shading.append("stop")
+                    .attr("offset", "100%").attr("stop-color", "#505962")
+                    .attr("stop-opacity", "0.3");
+
+
+            var ring_light = svg.append("defs").append("radialGradient")
+                    .attr("id", "ring_light")
+                    .attr("cx", "50%")
+                    .attr("cy", "50%")
+                    .attr("r", "110%");
+            ring_light.append("stop")
+                    .attr("offset", "5%").attr("stop-color", "#1c208c")
+                    .attr("stop-opacity", "1");
+            ring_light.append("stop")
+                    .attr("offset", "90%").attr("stop-color", "#000")
+                    .attr("stop-opacity", "0.2");
+
+            svg.append("defs")
+                    .append("filter")
+                    .attr("id", "blur")
+                    .append("feGaussianBlur")
+                    .attr("stdDeviation", 10);
+            svg.append("defs")
+                    .append("filter")
+                    .attr("id", "blur2")
+                    .append("feGaussianBlur")
+                    .attr("stdDeviation", 2);
+
+            svg.append("circle")
+                    .attr("cx", width / 2)
+                    .attr("cy", height / 2)
+                    .attr("r", sphere.scale() + 6)
+                    .style("fill", "rgba(0,0,255,1)")
+                    .style("filter", "url(#blur2)");
+            svg.append("circle")
+                    .attr("cx", width / 2)
+                    .attr("cy", height / 2)
+                    .attr("r", sphere.scale() + 4)
+                    .style("fill", "rgba(255,255,255,1)")
+                    .style("filter", "url(#blur)");
+            svg.append("circle")
+                    .attr("cx", width / 2)
+                    .attr("cy", height / 2)
+                    .attr("r", sphere.scale() + 4)
+                    .style("fill", "rgba(255,255,255,1)")
+                    .style("filter", "url(#blur)");
+
+            svg.append("circle")
+                    .attr("cx", width / 2).attr("cy", height / 2)
+                    .attr("r", sphere.scale())
+                    .style("fill", "#000");
+
+            svg.append("circle")
+                    .attr("cx", width / 2).attr("cy", height / 2)
+                    .attr("r", sphere.scale())
+                    .style("fill", "url(#ring_light)");
+
+            svg.append("circle")
+                    .attr("cx", width / 2).attr("cy", height / 2)
+                    .attr("r", sphere.scale())
+                    .style("stroke-width", "20px")
+                    .style("fill", "none")
+                    .style("stroke", "rgba(255,255,255,0.7)")
+                    .style("filter", "url(#blur)");
+
+            svg.append("circle")
+                    .attr("cx", width / 2).attr("cy", height / 2)
+                    .attr("r", sphere.scale())
+                    .style("fill", "url(#globe_highlight)");
+
+            var svggraph = svg.append("g");
+            svggraph
+                    .append("path")
+                    .datum(land)
+                    .attr("id", "land")
+                    .attr("fill", rgbaString(settings.SphereFill, settings.SphereFillOpacity))
+                    .attr("stroke", rgbaString(settings.SphereStroke, settings.SphereStrokeOpacity))
+                    .attr("d", path);
+            svggraph
+                    .append("path")
+                    .datum(boundaries)
+                    .attr("id", "boundry")
+                    .attr("stroke", rgbaString(settings.SphereStroke, settings.SphereStrokeOpacity))
+                    .attr("fill", "rgba(0,0,0,0)")
+                    .attr("d", path);
+            svg.append("g").attr("id", "label").selectAll("text")
+                    .data(topojson.feature(world, world.objects.countries).features)
+                    .enter()
+                    .append("text")
+                    .attr("id", function (d) {
+                        return d.properties.ISO_A2
+                    })
+                    .attr("class", "countryLabel")
+                    .attr("transform", "translate(-20,-20)")
+                    .attr("dy", ".35em")
+                    .text(function (d) {
+                        return d.properties.CName;
+                    });
+
+            if (settings.DEMO) {
+                startDEMO();
+            } else {
+            	/*
+                 $.post('../../../cron.php?do=wsurl', {}, function (ret) {
+            		if (ret) {
+            			settings.wsHost = ret;
+            			start(settings.wsHost, settings.psk);
+            		} else {
+            			alert('WS地址获取失败');
+            		}
+            	});*/
+            	startHTTP();
+            }
+            nodeModel.start();
+            painter.start();
+        });
+
+
+    $(document).ready(function () {
+        $(".icon-open").click(function (a) {
+            $(a.target.parentNode.nextElementSibling).slideToggle("slow");
+        });
+    });
+
+    function toogle() {
+        if ($(".table")[0].style.display == "none" && $(".table")[1].style.display == "none" && $(".table")[2].style.display == "none") {
+            $("#infoLeftTop").slideDown("slow");
+            $("#infoBottomLeft").slideDown("slow");
+            $("#infoBottomRight").slideDown("slow");
+            d3.select("#switchInfo")
+                    .attr("src", "img/icon_infoon.png");
+        } else {
+            $("#infoLeftTop").slideUp("slow");
+            $("#infoBottomLeft").slideUp("slow");
+            $("#infoBottomRight").slideUp("slow");
+            d3.select("#switchInfo")
+                    .attr("src", "img/icon_infooff.png");
+        }
+    }
+
+
+    // Select the canvas from the document.
+    var boxcanvas = document.querySelector("canvas");
+
+    // Create the WebGL context, with fallback for experimental support.
+    var WebGlcontext = boxcanvas.getContext("webgl")
+            || boxcanvas.getContext("experimental-webgl");
+
+    // Compile the vertex shader.
+    var vertexShader = WebGlcontext.createShader(WebGlcontext.VERTEX_SHADER);
+    WebGlcontext.shaderSource(vertexShader, document.querySelector("#vertex-shader").textContent);
+    WebGlcontext.compileShader(vertexShader);
+    if (!WebGlcontext.getShaderParameter(vertexShader, WebGlcontext.COMPILE_STATUS)) throw new Error(WebGlcontext.getShaderInfoLog(vertexShader));
+
+    // Compile the fragment shader.
+    var fragmentShader = WebGlcontext.createShader(WebGlcontext.FRAGMENT_SHADER);
+    WebGlcontext.shaderSource(fragmentShader, document.querySelector("#fragment-shader").textContent);
+    WebGlcontext.compileShader(fragmentShader);
+    if (!WebGlcontext.getShaderParameter(fragmentShader, WebGlcontext.COMPILE_STATUS)) throw new Error(WebGlcontext.getShaderInfoLog(fragmentShader));
+
+    // Link and use the program.
+    var program = WebGlcontext.createProgram();
+    WebGlcontext.attachShader(program, vertexShader);
+    WebGlcontext.attachShader(program, fragmentShader);
+    WebGlcontext.linkProgram(program);
+    if (!WebGlcontext.getProgramParameter(program, WebGlcontext.LINK_STATUS)) throw new Error(WebGlcontext.getProgramInfoLog(program));
+    WebGlcontext.useProgram(program);
+
+    // Define the positions (as vec2) of the square that covers the canvas.
+    var positionBuffer = WebGlcontext.createBuffer();
+    WebGlcontext.bindBuffer(WebGlcontext.ARRAY_BUFFER, positionBuffer);
+    WebGlcontext.bufferData(WebGlcontext.ARRAY_BUFFER, new Float32Array([
+        -1.0, -1.0,
+        +1.0, -1.0,
+        +1.0, +1.0,
+        -1.0, +1.0
+    ]), WebGlcontext.STATIC_DRAW);
+
+    // Bind the position buffer to the position attribute.
+    var positionAttribute = WebGlcontext.getAttribLocation(program, "a_position");
+    WebGlcontext.enableVertexAttribArray(positionAttribute);
+    WebGlcontext.vertexAttribPointer(positionAttribute, 2, WebGlcontext.FLOAT, false, 0, 0);
+
+    // Extract the projection parameters.
+    var translateUniform = WebGlcontext.getUniformLocation(program, "u_translate"),
+            scaleUniform = WebGlcontext.getUniformLocation(program, "u_scale"),
+            rotateUniform = WebGlcontext.getUniformLocation(program, "u_rotate");
+
+    // Load the reference image.
+    //var image = new Image;
+    //image.src = settings.backgroundimg;
+    //image.onload = readySoon;
+    self.onresize = resize;
+
+    // Hack to ensure correct inference of window dimensions.
+    function readySoon() {
+       setTimeout(function () {
+            resize();
+            ready();
+        }, 10);
+    }
+	changebg(1);
+	function changebg (is3d) {
+		var bg  = is3d ?  settings.bg_3d : settings.bg_2d;
+		$('body').css('background', bg);
+	}
+    function resize() {
+        width = Math.max(960, self.innerWidth);
+        height = Math.max(500, self.innerHeight);
+        boxcanvas.setAttribute("width", width+"px");
+        boxcanvas.setAttribute("height", height+"px");
+        WebGlcontext.uniform2f(translateUniform, width / 2, height / 2);
+        WebGlcontext.uniform1f(scaleUniform, 500);
+        WebGlcontext.viewport(0, 0, width, height);
+        svg.attr("width", width).attr("height", height);
+        canvas.attr("width", width).attr("height", height);
+        projection.translate([width / 2, height / 2]);
+        flat.scale(width / 6);
+        sphere.scale(height / 2.5);
+        d3.selectAll("circle").attr("cx", width / 2).attr("cy", height / 2).attr("r", sphere.scale());
+
+    }
+	resize();
+    function ready() {
+
+        // Create a texture and a mipmap for accurate minification.
+        var texture = WebGlcontext.createTexture();
+        WebGlcontext.bindTexture(WebGlcontext.TEXTURE_2D, texture);
+        WebGlcontext.texParameteri(WebGlcontext.TEXTURE_2D, WebGlcontext.TEXTURE_MAG_FILTER, WebGlcontext.LINEAR);
+        WebGlcontext.texParameteri(WebGlcontext.TEXTURE_2D, WebGlcontext.TEXTURE_MIN_FILTER, WebGlcontext.LINEAR_MIPMAP_LINEAR);
+        WebGlcontext.texImage2D(WebGlcontext.TEXTURE_2D, 0, WebGlcontext.RGBA, WebGlcontext.RGBA, WebGlcontext.UNSIGNED_BYTE, image);
+        WebGlcontext.generateMipmap(WebGlcontext.TEXTURE_2D);
+
+        // The current rotation and speed.
+        var rotate = [0, 0],
+                speed = [.001, 0];
+
+        redraw();
+
+        // Rotate and redraw!
+        function redraw() {
+            rotate[0] += speed[0];
+            rotate[1] += speed[1];
+            WebGlcontext.uniform2fv(rotateUniform, rotate);
+            WebGlcontext.bindTexture(WebGlcontext.TEXTURE_2D, texture); // XXX Safari
+            WebGlcontext.drawArrays(WebGlcontext.TRIANGLE_FAN, 0, 4);
+            requestAnimationFrame(redraw);
+        }
+    }
+
+    // A polyfill for requestAnimationFrame.
+    if (!self.requestAnimationFrame) requestAnimationFrame =
+            self.webkitRequestAnimationFrame
+            || self.mozRequestAnimationFrame
+            || self.msRequestAnimationFrame
+            || self.oRequestAnimationFrame
+            || function (f) {
+                setTimeout(f, 50);
+            };
+
+
+</script>
+
+</body>
+</html>
