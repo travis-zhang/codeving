@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <script type="text/javascript" src="jquery.min.js"></script>
+</head>
+
+<body>
+    <script>
+    //var year = [2012, 2013, 2014, 2015, 2016];
+    var year = [2016,2015,2014];
+
+    //var url = "./2016-10.json";
+    //var url = "https://trello.com/card/5774f27db7ac796f9f8ceee1/2016-7.json";
+    var url = "";
+    $(document).ready(function() {
+
+        for (var y = 0; y < year.length; y++){
+            
+            for (var m = 12; m > 0; m--){
+                var ujson = "./" + year[y] + "-" + m + ".json";
+                console.debug(ujson);
+                url = ujson;
+                try {
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        //data: {times:(new Date().getTime())},
+                        cache: false,
+                        async: false,
+                        dataType: "json",
+                        success: function(data) {
+                            if (data == null) {
+                                console.debug(year[y] + "年" + m + "月 没有数据");
+                                document.writeln("<span style='color:red;'>"+year[y] + "年" + m + "月 没有数据" + "</span><br>");
+                            } else {
+                                console.debug(year[y] + "年" + m + "月 数据 : ");
+                                document.writeln("<span style='color:red;'>"+year[y] + "年" + m + "月 数据 :" + "</span><br>");
+                                var dcl = data.checklists;
+                                for (var i = 0; i < dcl.length; i++) {
+                                    var dti = dcl[i].checkItems;
+                                    console.debug(dti);
+                                    for (var j = 0; j < dti.length; j++) {
+                                        var option = dti[j].name;
+                                        console.debug(option);
+                                        document.writeln(option + "<br>");
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error(e.message);
+                    console.error(e);
+                }
+            }
+        }
+    });
+    </script>
+</body>
+
+</html>
