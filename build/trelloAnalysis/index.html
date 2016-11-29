@@ -4,12 +4,25 @@
 <head>
     <meta charset="utf-8" />
     <script type="text/javascript" src="jquery.min.js"></script>
+    <script type="text/javascript" src="hashmap.js"></script>
+    <script type="text/javascript" src="decimal.min.js"></script>
 </head>
 
 <body>
     <script>
+    var JTmap = new HashMap();
+    var SHmap = new HashMap();
+    var TXmap = new HashMap();
+    var GZmap = new HashMap();
+    var LXmap = new HashMap();
+    var GNmap = new HashMap();
+    var FZmap = new HashMap();
+    var OTmap = new HashMap();
+    
+    
     //var year = [2012, 2013, 2014, 2015, 2016];
-    var year = [2016,2015,2014];
+    //var year = [2016,2015,2014];
+    var year = [2015,2016];
 
     //var url = "./2016-10.json";
     //var url = "https://trello.com/card/5774f27db7ac796f9f8ceee1/2016-7.json";
@@ -31,6 +44,7 @@
                         async: false,
                         dataType: "json",
                         success: function(data) {
+                            console.info(data)
                             if (data == null) {
                                 console.debug(year[y] + "年" + m + "月 没有数据");
                                 document.writeln("<span style='color:red;'>"+year[y] + "年" + m + "月 没有数据" + "</span><br>");
@@ -39,13 +53,28 @@
                                 document.writeln("<span style='color:red;'>"+year[y] + "年" + m + "月 数据 :" + "</span><br>");
                                 var dcl = data.checklists;
                                 for (var i = 0; i < dcl.length; i++) {
+
                                     var dti = dcl[i].checkItems;
-                                    console.debug(dti);
-                                    for (var j = 0; j < dti.length; j++) {
-                                        var option = dti[j].name;
-                                        console.debug(option);
-                                        document.writeln(option + "<br>");
+                                    console.error(dcl[i].name);
+
+                                    if('交通'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(JTmap,dti,year,y,m,dcl[i].name);
+                                    }else if('通讯'.indexOf(dcl[i].name) != -1 || '电话'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(TXmap,dti,year,y,m,dcl[i].name);
+                                    }else if('生活'.indexOf(dcl[i].name) != -1 || '日常'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(SHmap,dti,year,y,m,dcl[i].name);
+                                    }else if('工作'.indexOf(dcl[i].name) != -1 || '报销'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(GZmap,dti,year,y,m,dcl[i].name);
+                                    }else if('旅行'.indexOf(dcl[i].name) != -1 || '旅游'.indexOf(dcl[i].name) != -1|| '韩国'.indexOf(dcl[i].name) != -1){
+                                       mapSetData(LXmap,dti,year,y,m,dcl[i].name);
+                                    }else if('过年'.indexOf(dcl[i].name) != -1 || '春节'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(GNmap,dti,year,y,m,dcl[i].name);
+                                    }else if('房子'.indexOf(dcl[i].name) != -1 || '房租'.indexOf(dcl[i].name) != -1){
+                                        mapSetData(FZmap,dti,year,y,m,dcl[i].name);
+                                    }else{
+                                        mapSetData(OTmap,dti,year,y,m,dcl[i].name);
                                     }
+
                                 }
                             }
                         }
@@ -56,7 +85,61 @@
                 }
             }
         }
+
+        console.debug({"name":"交通：JTmap","map":JTmap});
+        console.debug({"name":"通讯：TXmap","map":TXmap});
+        console.debug({"name":"生活：SHmap","map":SHmap});
+        console.debug({"name":"工作：GZmap","map":GZmap});
+        console.debug({"name":"旅行：LXmap","map":LXmap});
+        console.debug({"name":"过年：GNmap","map":GNmap});
+        console.debug({"name":"房子：FZmap","map":FZmap});
+        console.debug({"name":"其他：OTmap","map":OTmap});
+
     });
+
+    function mapSetData(map,dti,year,y,m,name){
+        for (var j = 0; j < dti.length; j++) {
+            var option = dti[j].name;
+            var key = 1;
+            var istr = m+'.'; 
+            
+            // if(option.indexOf(m+'.')){
+            // }
+            if(option.indexOf(istr) == 0){
+
+                console.debug('下标位置：'+option.indexOf(istr)+'，索引字符：'+(istr));
+                
+
+                var getin = option.substring(0,istr.length+1),
+                getot = option.substring(istr.length+1,istr.length+2);
+                if('1234567890'.indexOf(getot) != -1){
+                    console.error(getin);
+                    console.error(getot);
+                    console.error(getin+getot);
+                }else{
+                    console.warn(getin);
+                }
+
+            }else if(option.indexOf(istr) != -1){
+                
+                console.info('下标位置：'+option.indexOf(istr)+'，索引字符：'+(istr));
+            }else{
+                
+                console.info('无日期：'+option);
+            }
+            
+            map.set(year[y]+'-'+m+'-'+j,option+'||'+name);
+
+            console.debug("旅行&旅游"+option);
+            document.writeln(option + "<br>");
+        }   
+    }
+
+    function str2Number(str){
+        var nd = new Decimal(str);
+        return nd.isNaN();
+    }
+
     </script>
 </body>
 
