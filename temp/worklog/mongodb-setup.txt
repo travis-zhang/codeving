@@ -1,3 +1,19 @@
+my macbook pro:
+export PATH=</Users/travis/Documents/0009Database/mongodb>/bin:$PATH
+\
+
+export PATH=/Users/travis/Documents/0009Database/mongodb/bin:$PATH
+
+
+mongod --dbpath /Users/travis/Documents/0009Database/mongodb/DB
+
+
+/Users/travis/Documents/0004-WorkSpace/Develop/WebStorm/Nodejs/keystone/my-test-project/travis
+
+
+
+one scorpion company Mac:
+
 /usr/local/opt/mongodb/bin/mongod --config /usr/local/etc/mongod.conf
 
 localhost:~ ons$ brew install mongodb
