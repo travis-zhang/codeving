@@ -1,0 +1,40 @@
+/usr/local/opt/mongodb/bin/mongod --config /usr/local/etc/mongod.conf
+
+localhost:~ ons$ brew install mongodb
+^C==> Downloading https://homebrew.bintray.com/bottles/mongodb-3.2.10.sierra.bottle.tar.gz
+######################################################################## 100.0%
+==> Pouring mongodb-3.2.10.sierra.bottle.tar.gz
+==> Caveats
+To have launchd start mongodb now and restart at login:
+  brew services start mongodb
+Or, if you don't want/need a background service you can just run:
+  mongod --config /usr/local/etc/mongod.conf
+==> Summary
+🍺  /usr/local/Cellar/mongodb/3.2.10: 18 files, 245M
+localhost:~ ons$ cat /usr/local/etc/mongod.conf
+systemLog:
+  destination: file
+  path: /usr/local/var/log/mongodb/mongo.log
+  logAppend: true
+storage:
+  dbPath: /usr/local/var/mongodb
+net:
+  bindIp: 127.0.0.1
+localhost:~ ons$ brew services start mongodb
+==> Tapping homebrew/services
+Cloning into '/usr/local/Homebrew/Library/Taps/homebrew/homebrew-services'...
+remote: Counting objects: 10, done.
+remote: Compressing objects: 100% (7/7), done.
+remote: Total 10 (delta 0), reused 6 (delta 0), pack-reused 0
+Unpacking objects: 100% (10/10), done.
+Checking connectivity... done.
+Tapped 0 formulae (36 files, 47.2K)
+==> Successfully started `mongodb` (label: homebrew.mxcl.mongodb)
+localhost:~ ons$ brew services stop mongodb
+Stopping `mongodb`... (might take a while)
+==> Successfully stopped `mongodb` (label: homebrew.mxcl.mongodb)
+localhost:~ ons$ brew services start mongodb
+==> Successfully started `mongodb` (label: homebrew.mxcl.mongodb)
+localhost:~ ons$ ps -ef|grep mongodb
+  501 42446     1   0  9:10上午 ??         0:02.04 /usr/local/opt/mongodb/bin/mongod --config /usr/local/etc/mongod.conf
+  501 42903 40862   0  9:24上午 ttys001    0:00.00 grep mongodb

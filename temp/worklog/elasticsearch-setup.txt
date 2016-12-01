@@ -1,0 +1,25 @@
+
+elasticsearch
+
+sudo bin/plugin install mobz/elasticsearch-head
+sudo bin/plugin install https://github.com/NLPchina/elasticsearch-sql/releases/download/2.4.1.0/elasticsearch-sql-2.4.1.0.zip
+sudo bin/plugin install lmenezes/elasticsearch-kopf
+
+
+sudo bin/plugin install license
+sudo bin/plugin install shield
+bin/shield/esusers useradd es_admin -r admin
+sudo bin/plugin install marvel-agent
+
+
+
+
+
+
+Elasticsearch
+Kibana
+Beats
+Logstash
+ES-Hadoop
+X-Pack
+Elastic Cloud
