@@ -1,0 +1,5 @@
+mongodb 可视化工具下载链接
+
+https://cdn.3t.io/mongochef-core/mac/4.4.2/MongoChef.dmg
+https://cdn.3t.io/mongochef-core/windows/4.4.2/mongochef-x64.msi.zip
+https://cdn.3t.io/mongochef-core/linux/4.4.2/mongochef-linux-x64-dist.tar.gz
