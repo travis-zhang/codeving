@@ -1,0 +1,49 @@
+norsecorp-res.txt
+
+http://map.norsecorp.com/#/
+
+官方介绍：
+
+Norse 接收来自世界任何地方部署了超过800万个传感器瞬发攻击遥测,
+并运营着全球最大的商业袭击情报数据库，有超过700 PB的详细的攻击历史,
+而且Norse的传感器和蜜罐可以效仿6000多共同攻击的设备及应用.
+挪威人保持了全球最大的致力于威胁情报网络。超过800多万的传感器，
+模拟六千应用 - 从苹果笔记本电脑，到ATM机，关键基础设施系统，
+闭路电视摄影机 - Norse 情报网络收集关于谁是攻击者的数据，他们追求的是什么。
+挪威提供通过Norse 电器的数据，这先发制人阻止攻击并提高整体安全的投资回报率，
+以及挪威情报服务，提供专业的持续威胁监测大型网络。
+
+https://itkz.cn/tools/norsesource.html
+https://itkz.cn/tools/norse/
+
+提示：GWF已墙NORSE公共源 国内大部分地区都不能调用NORSE源数据了 
+
+现在的V3演示可用 有兴趣的童鞋可以去Down源码 2016.7
+
+本站地址: http://itkz.cn/tools/norse/
+
+官网地址：http://map.norsecorp.com/
+
+目录结构:.
+├─assets
+├─data
+├─fonts
+├─img
+│  └─flags
+└─v1
+    ├─data
+    ├─fonts
+    └─images
+        └─flags
+
+源码简介: 
+
+V2版本未作过多修改,在HTML的介绍部分做了中文翻译,个人觉得其他改成中文的没啥意思,请自行修改
+
+数据源依然引用官方ws实时数据。有耐心的同学可以自己去官网抠源码。
+
+注意 json需要web支持，直接打开是运行不了的.
+
+其中v1版本来自好友共享源码，我也就懒得再搞了。
+
+下载地址：http://pan.baidu.com/s/1o65uFb0 密码：uoyu
