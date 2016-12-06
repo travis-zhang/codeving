@@ -1,4 +1,7 @@
 KASPERSKY-res.txt
 
 https://cybermap.kaspersky.com/#
+
 https://cybermap.kaspersky.com/Screensaver-Mac.zip
+https://cybermap.kaspersky.com/Screensaver-PC-x86.zip
+https://cybermap.kaspersky.com/Screensaver-PC-x64.zip
