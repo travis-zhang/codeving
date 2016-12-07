@@ -1,0 +1,234 @@
+#footer {
+    display: block;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    bottom: 0px;
+    height: 50px;
+    border-top: 1px solid #19241E;
+    z-index: 25;
+    background-color: #050907;
+}
+
+#footer_logo {
+    display: inline-block;
+    float: left;
+    width: 150px;
+    height: 100%;
+    background-image: url('../images/kaspersky_logo_white.svg');
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+#footer_copyright {
+    float: left;
+    line-height: 50px;
+    top: 0;
+    padding-left: 5px;
+    color: #315342;
+    font-size: 11px;
+}
+
+#tos_link {
+    font-size: 11px;
+    color: #315342;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#footer_copyright a:hover {
+    color: #629c7f !important;
+}
+
+#footer_social_channels{
+    float: right;
+    height: 100%;
+    line-height: 50px;
+}
+
+#footer_screensaver {
+    float: right;
+    height: 100%;
+    line-height: 50px;
+    border-left: 1px solid #19241E;
+    border-right: 1px solid #19241E;
+    padding: 0 20px;
+}
+
+#footer_screensaver a {
+    color: #315342;
+}
+
+#footer_screensaver:hover {
+    background-color: #629C7F;
+}
+
+#footer_info {
+    float: right;
+    height: 100%;
+    line-height: 50px;
+    top: 0;
+    color: #848484;
+    padding: 0 20px;
+    font-size: 11px;
+}
+
+#footer_social_channels {
+    float: right;
+    height: 100%;
+    line-height: 50px;
+    color: #848484;
+    padding: 0 5px;
+    font-size: 11px;
+}
+
+#footer_social_channels ul {
+    list-style-type: none;
+}
+
+#footer_social_channels ul li {
+    display: block;
+    float: left;
+    height: 50px;
+    line-height: 50px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+#footer_social_channels ul li a {
+    width:40px;
+    height: 40px;
+    display: block;
+    line-height: 50px;
+    color: #315342;
+    text-decoration: none;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+#footer_social_channels ul li a i {
+    display: block;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    left: 50%;
+    top: 12px;
+    margin-left: -15px;
+}
+
+#footer_social_channels ul li.facebook a { background-image: url('../images/vector/social_icons/circle/social-facebook.svg'); }
+#footer_social_channels ul li.facebook a:hover { background-image: url('../images/vector/social_icons/circle/social-facebook.svg') !important; }
+#footer_social_channels ul li.twitter a { background-image: url('../images/vector/social_icons/circle/social-twitter.svg'); }
+#footer_social_channels ul li.twitter a:hover { background-image: url('../images/vector/social_icons/circle/social-twitter.svg') !important; }
+#footer_social_channels ul li.gplus a { background-image: url('../images/vector/social_icons/circle/social-google-plus.svg'); }
+#footer_social_channels ul li.gplus a:hover { background-image: url('../images/vector/social_icons/circle/social-google-plus.svg') !important; }
+#footer_social_channels ul li.linkedin a { background-image: url('../images/vector/social_icons/circle/social-linkedin.svg'); }
+#footer_social_channels ul li.linkedin a:hover { background-image: url('../images/vector/social_icons/circle/social-linkedin.svg') !important; }
+#footer_social_channels ul li.vk a { background-image: url('../images/vector/social_icons/circle/social-vk.svg'); }
+#footer_social_channels ul li.vk a:hover { background-image: url('../images/vector/social_icons/circle/social-vk.svg') !important; }
+
+
+#footer_openclose_button {
+    display: none;
+}
+
+#footer_screensaver {
+    cursor: pointer;
+}
+
+@media (min-width: 641px) and (max-width: 1280px) {
+
+    #footer_logo {
+        height: 30px;
+        width: 100px;
+    }
+
+    #footer_copyright {
+        line-height: 20px;
+        clear: left;
+        padding-left: 10px;
+    }
+
+    #footer_info {
+        line-height: 20px;
+        float: left;
+        height: 20px;
+    }
+
+    #footer_social_channels {
+        height: 30px;
+        padding: 0;
+    }
+
+    #footer_social_channels ul li a {
+        width: 30px;
+        height: 30px;
+    }
+
+    #footer_screensaver {
+        line-height: 20px;
+        height: 20px;
+        top: 0;
+        padding: 0 5px;
+    }
+}
+
+
+@media (max-width: 640px) {
+    #footer {
+        height: 50px;
+    }
+
+    #footer_logo {
+        display: block;
+        width: 150px;
+        height: 50px;
+        margin: 0 auto;
+        float: none;
+    }
+
+    #footer_copyright {
+        display: block;
+        float: none;
+        text-align: center;
+        line-height: 20px;
+    }
+
+    #footer_info {
+        display: block;
+        float: none;
+        text-align: center;
+        line-height: 15px;
+    }
+
+    #footer_screensaver {
+        display: none;
+    }
+
+    #footer_social_channels {
+        display: block;
+        float: none;
+        height: 50px;
+        text-align: center;
+    }
+
+    #footer_social_channels ul {
+        display: inline-block;
+    }
+
+    #footer_openclose_button {
+        display: block;
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 10px;
+        right: 10px;
+        background-image: url('../images/vector/arrows/icon-arrow-down-grey.svg');
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
+
+    #footer_openclose_button.closed {
+        background-image: url('../images/vector/arrows/icon-arrow-up-grey.svg');
+    }
+}

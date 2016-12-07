@@ -1,0 +1,440 @@
+/* WM-O: created from several sources, every.scaling_text that sees this, feel free to copy chocolate-paste it to your own stuffs */
+/* 1.05 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.05),
+only screen and (   min--moz-device-pixel-ratio: 1.05),
+only screen and (     -o-min-device-pixel-ratio: 1.05/1),
+only screen and (        min-device-pixel-ratio: 1.05),
+only screen and (                min-resolution: 100.8dpi),
+only screen and (                min-resolution: 1.05dppx) {
+    .scaling_text { font-size: 105%; }
+}
+
+/* 1.1 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.1),
+only screen and (   min--moz-device-pixel-ratio: 1.1),
+only screen and (     -o-min-device-pixel-ratio: 1.1/1),
+only screen and (        min-device-pixel-ratio: 1.1),
+only screen and (                min-resolution: 105.6dpi),
+only screen and (                min-resolution: 1.1dppx) {
+    .scaling_text { font-size: 110%; }
+}
+
+/* 1.15 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.15),
+only screen and (   min--moz-device-pixel-ratio: 1.15),
+only screen and (     -o-min-device-pixel-ratio: 1.15/1),
+only screen and (        min-device-pixel-ratio: 1.15),
+only screen and (                min-resolution: 110.4dpi),
+only screen and (                min-resolution: 1.15dppx) {
+    .scaling_text { font-size: 115%; }
+}
+
+/* 1.2 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.2),
+only screen and (   min--moz-device-pixel-ratio: 1.2),
+only screen and (     -o-min-device-pixel-ratio: 1.2/1),
+only screen and (        min-device-pixel-ratio: 1.2),
+only screen and (                min-resolution: 115.2dpi),
+only screen and (                min-resolution: 1.2dppx) {
+    .scaling_text { font-size: 120%; }
+}
+
+/* 1.25 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.25),
+only screen and (   min--moz-device-pixel-ratio: 1.25),
+only screen and (     -o-min-device-pixel-ratio: 1.25/1),
+only screen and (        min-device-pixel-ratio: 1.25),
+only screen and (                min-resolution: 120dpi),
+only screen and (                min-resolution: 1.25dppx) {
+    .scaling_text { font-size: 125%; }
+}
+
+/* 1.3 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.3),
+only screen and (   min--moz-device-pixel-ratio: 1.3),
+only screen and (     -o-min-device-pixel-ratio: 1.3/1),
+only screen and (        min-device-pixel-ratio: 1.3),
+only screen and (                min-resolution: 124.8dpi),
+only screen and (                min-resolution: 1.3dppx) {
+    .scaling_text { font-size: 130%; }
+}
+
+/* 1.35 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.35),
+only screen and (   min--moz-device-pixel-ratio: 1.35),
+only screen and (     -o-min-device-pixel-ratio: 1.35/1),
+only screen and (        min-device-pixel-ratio: 1.35),
+only screen and (                min-resolution: 129.6dpi),
+only screen and (                min-resolution: 1.35dppx) {
+    .scaling_text { font-size: 135%; }
+}
+
+/* 1.4 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.4),
+only screen and (   min--moz-device-pixel-ratio: 1.4),
+only screen and (     -o-min-device-pixel-ratio: 1.4/1),
+only screen and (        min-device-pixel-ratio: 1.4),
+only screen and (                min-resolution: 134.4dpi),
+only screen and (                min-resolution: 1.4dppx) {
+    .scaling_text { font-size: 140%; }
+}
+
+/* 1.45 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.45),
+only screen and (   min--moz-device-pixel-ratio: 1.45),
+only screen and (     -o-min-device-pixel-ratio: 1.45/1),
+only screen and (        min-device-pixel-ratio: 1.45),
+only screen and (                min-resolution: 139.2dpi),
+only screen and (                min-resolution: 1.45dppx) {
+    .scaling_text { font-size: 145%; }
+}
+
+/* 1.5 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (   min--moz-device-pixel-ratio: 1.5),
+only screen and (     -o-min-device-pixel-ratio: 1.5/1),
+only screen and (        min-device-pixel-ratio: 1.5),
+only screen and (                min-resolution: 144dpi),
+only screen and (                min-resolution: 1.5dppx) {
+    .scaling_text { font-size: 150%; }
+}
+
+/* 1.55 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.55),
+only screen and (   min--moz-device-pixel-ratio: 1.55),
+only screen and (     -o-min-device-pixel-ratio: 1.55/1),
+only screen and (        min-device-pixel-ratio: 1.55),
+only screen and (                min-resolution: 148.8dpi),
+only screen and (                min-resolution: 1.55dppx) {
+    .scaling_text { font-size: 155%; }
+}
+
+/* 1.6 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.6),
+only screen and (   min--moz-device-pixel-ratio: 1.6),
+only screen and (     -o-min-device-pixel-ratio: 1.6/1),
+only screen and (        min-device-pixel-ratio: 1.6),
+only screen and (                min-resolution: 153.6dpi),
+only screen and (                min-resolution: 1.6dppx) {
+    .scaling_text { font-size: 160%; }
+}
+
+/* 1.65 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.65),
+only screen and (   min--moz-device-pixel-ratio: 1.65),
+only screen and (     -o-min-device-pixel-ratio: 1.65/1),
+only screen and (        min-device-pixel-ratio: 1.65),
+only screen and (                min-resolution: 158.4dpi),
+only screen and (                min-resolution: 1.65dppx) {
+    .scaling_text { font-size: 165%; }
+}
+
+/* 1.7 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.7),
+only screen and (   min--moz-device-pixel-ratio: 1.7),
+only screen and (     -o-min-device-pixel-ratio: 1.7/1),
+only screen and (        min-device-pixel-ratio: 1.7),
+only screen and (                min-resolution: 163.2dpi),
+only screen and (                min-resolution: 1.7dppx) {
+    .scaling_text { font-size: 170%; }
+}
+
+/* 1.75 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.75),
+only screen and (   min--moz-device-pixel-ratio: 1.75),
+only screen and (     -o-min-device-pixel-ratio: 1.75/1),
+only screen and (        min-device-pixel-ratio: 1.75),
+only screen and (                min-resolution: 168dpi),
+only screen and (                min-resolution: 1.75dppx) {
+    .scaling_text { font-size: 175%; }
+}
+
+/* 1.8 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.8),
+only screen and (   min--moz-device-pixel-ratio: 1.8),
+only screen and (     -o-min-device-pixel-ratio: 1.8/1),
+only screen and (        min-device-pixel-ratio: 1.8),
+only screen and (                min-resolution: 172.8dpi),
+only screen and (                min-resolution: 1.8dppx) {
+    .scaling_text { font-size: 180%; }
+}
+
+/* 1.85 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.85),
+only screen and (   min--moz-device-pixel-ratio: 1.85),
+only screen and (     -o-min-device-pixel-ratio: 1.85/1),
+only screen and (        min-device-pixel-ratio: 1.85),
+only screen and (                min-resolution: 177.6dpi),
+only screen and (                min-resolution: 1.85dppx) {
+    .scaling_text { font-size: 185%; }
+}
+
+/* 1.9 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.9),
+only screen and (   min--moz-device-pixel-ratio: 1.9),
+only screen and (     -o-min-device-pixel-ratio: 1.9/1),
+only screen and (        min-device-pixel-ratio: 1.9),
+only screen and (                min-resolution: 182.4dpi),
+only screen and (                min-resolution: 1.9dppx) {
+    .scaling_text { font-size: 190%; }
+}
+
+/* 1.95 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 1.95),
+only screen and (   min--moz-device-pixel-ratio: 1.95),
+only screen and (     -o-min-device-pixel-ratio: 1.95/1),
+only screen and (        min-device-pixel-ratio: 1.95),
+only screen and (                min-resolution: 187.2dpi),
+only screen and (                min-resolution: 1.95dppx) {
+    .scaling_text { font-size: 195%; }
+}
+
+/* 2 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2),
+only screen and (   min--moz-device-pixel-ratio: 2),
+only screen and (     -o-min-device-pixel-ratio: 2/1),
+only screen and (        min-device-pixel-ratio: 2),
+only screen and (                min-resolution: 192dpi),
+only screen and (                min-resolution: 2dppx) {
+    .scaling_text { font-size: 200%; }
+}
+
+/* 2.05 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.05),
+only screen and (   min--moz-device-pixel-ratio: 2.05),
+only screen and (     -o-min-device-pixel-ratio: 2.05/1),
+only screen and (        min-device-pixel-ratio: 2.05),
+only screen and (                min-resolution: 196.8dpi),
+only screen and (                min-resolution: 2.05dppx) {
+    .scaling_text { font-size: 205%; }
+}
+
+/* 2.1 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.1),
+only screen and (   min--moz-device-pixel-ratio: 2.1),
+only screen and (     -o-min-device-pixel-ratio: 2.1/1),
+only screen and (        min-device-pixel-ratio: 2.1),
+only screen and (                min-resolution: 201.6dpi),
+only screen and (                min-resolution: 2.1dppx) {
+    .scaling_text { font-size: 210%; }
+}
+
+/* 2.15 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.15),
+only screen and (   min--moz-device-pixel-ratio: 2.15),
+only screen and (     -o-min-device-pixel-ratio: 2.15/1),
+only screen and (        min-device-pixel-ratio: 2.15),
+only screen and (                min-resolution: 206.4dpi),
+only screen and (                min-resolution: 2.15dppx) {
+    .scaling_text { font-size: 215%; }
+}
+
+/* 2.2 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.2),
+only screen and (   min--moz-device-pixel-ratio: 2.2),
+only screen and (     -o-min-device-pixel-ratio: 2.2/1),
+only screen and (        min-device-pixel-ratio: 2.2),
+only screen and (                min-resolution: 211.2dpi),
+only screen and (                min-resolution: 2.2dppx) {
+    .scaling_text { font-size: 220%; }
+}
+
+/* 2.25 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.25),
+only screen and (   min--moz-device-pixel-ratio: 2.25),
+only screen and (     -o-min-device-pixel-ratio: 2.25/1),
+only screen and (        min-device-pixel-ratio: 2.25),
+only screen and (                min-resolution: 216dpi),
+only screen and (                min-resolution: 2.25dppx) {
+    .scaling_text { font-size: 225%; }
+}
+
+/* 2.3 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.3),
+only screen and (   min--moz-device-pixel-ratio: 2.3),
+only screen and (     -o-min-device-pixel-ratio: 2.3/1),
+only screen and (        min-device-pixel-ratio: 2.3),
+only screen and (                min-resolution: 220.8dpi),
+only screen and (                min-resolution: 2.3dppx) {
+    .scaling_text { font-size: 230%; }
+}
+
+/* 2.35 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.35),
+only screen and (   min--moz-device-pixel-ratio: 2.35),
+only screen and (     -o-min-device-pixel-ratio: 2.35/1),
+only screen and (        min-device-pixel-ratio: 2.35),
+only screen and (                min-resolution: 225.6dpi),
+only screen and (                min-resolution: 2.35dppx) {
+    .scaling_text { font-size: 235%; }
+}
+
+/* 2.4 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.4),
+only screen and (   min--moz-device-pixel-ratio: 2.4),
+only screen and (     -o-min-device-pixel-ratio: 2.4/1),
+only screen and (        min-device-pixel-ratio: 2.4),
+only screen and (                min-resolution: 230.4dpi),
+only screen and (                min-resolution: 2.4dppx) {
+    .scaling_text { font-size: 240%; }
+}
+
+/* 2.45 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.45),
+only screen and (   min--moz-device-pixel-ratio: 2.45),
+only screen and (     -o-min-device-pixel-ratio: 2.45/1),
+only screen and (        min-device-pixel-ratio: 2.45),
+only screen and (                min-resolution: 235.2dpi),
+only screen and (                min-resolution: 1.45dppx) {
+    .scaling_text { font-size: 245%; }
+}
+
+/* 2.5 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.5),
+only screen and (   min--moz-device-pixel-ratio: 2.5),
+only screen and (     -o-min-device-pixel-ratio: 2.5/1),
+only screen and (        min-device-pixel-ratio: 2.5),
+only screen and (                min-resolution: 240dpi),
+only screen and (                min-resolution: 2.5dppx) {
+    .scaling_text { font-size: 250%; }
+}
+
+/* 2.55 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.55),
+only screen and (   min--moz-device-pixel-ratio: 2.55),
+only screen and (     -o-min-device-pixel-ratio: 2.55/1),
+only screen and (        min-device-pixel-ratio: 2.55),
+only screen and (                min-resolution: 244.8dpi),
+only screen and (                min-resolution: 2.55dppx) {
+    .scaling_text { font-size: 255%; }
+}
+
+/* 2.6 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.6),
+only screen and (   min--moz-device-pixel-ratio: 2.6),
+only screen and (     -o-min-device-pixel-ratio: 2.6/1),
+only screen and (        min-device-pixel-ratio: 2.6),
+only screen and (                min-resolution: 249.6dpi),
+only screen and (                min-resolution: 2.6dppx) {
+    .scaling_text { font-size: 260%; }
+}
+
+/* 2.65 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.65),
+only screen and (   min--moz-device-pixel-ratio: 2.65),
+only screen and (     -o-min-device-pixel-ratio: 2.65/1),
+only screen and (        min-device-pixel-ratio: 2.65),
+only screen and (                min-resolution: 254.4dpi),
+only screen and (                min-resolution: 2.65dppx) {
+    .scaling_text { font-size: 265%; }
+}
+
+/* 2.7 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.7),
+only screen and (   min--moz-device-pixel-ratio: 2.7),
+only screen and (     -o-min-device-pixel-ratio: 2.7/1),
+only screen and (        min-device-pixel-ratio: 2.7),
+only screen and (                min-resolution: 163.2dpi),
+only screen and (                min-resolution: 2.7dppx) {
+    .scaling_text { font-size: 270%; }
+}
+
+/* 2.75 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.75),
+only screen and (   min--moz-device-pixel-ratio: 2.75),
+only screen and (     -o-min-device-pixel-ratio: 2.75/1),
+only screen and (        min-device-pixel-ratio: 2.75),
+only screen and (                min-resolution: 259.2dpi),
+only screen and (                min-resolution: 2.75dppx) {
+    .scaling_text { font-size: 275%; }
+}
+
+/* 2.8 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.8),
+only screen and (   min--moz-device-pixel-ratio: 2.8),
+only screen and (     -o-min-device-pixel-ratio: 2.8/1),
+only screen and (        min-device-pixel-ratio: 2.8),
+only screen and (                min-resolution: 268.8dpi),
+only screen and (                min-resolution: 2.8dppx) {
+    .scaling_text { font-size: 280%; }
+}
+
+/* 2.85 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.85),
+only screen and (   min--moz-device-pixel-ratio: 2.85),
+only screen and (     -o-min-device-pixel-ratio: 2.85/1),
+only screen and (        min-device-pixel-ratio: 2.85),
+only screen and (                min-resolution: 273.6dpi),
+only screen and (                min-resolution: 2.85dppx) {
+    .scaling_text { font-size: 285%; }
+}
+
+/* 2.9 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.9),
+only screen and (   min--moz-device-pixel-ratio: 2.9),
+only screen and (     -o-min-device-pixel-ratio: 2.9/1),
+only screen and (        min-device-pixel-ratio: 2.9),
+only screen and (                min-resolution:278.4dpi),
+only screen and (                min-resolution: 2.9dppx) {
+    .scaling_text { font-size: 290%; }
+}
+
+/* 2.95 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 2.95),
+only screen and (   min--moz-device-pixel-ratio: 2.95),
+only screen and (     -o-min-device-pixel-ratio: 2.95/1),
+only screen and (        min-device-pixel-ratio: 2.95),
+only screen and (                min-resolution: 283.2dpi),
+only screen and (                min-resolution: 2.95dppx) {
+    .scaling_text { font-size: 295%; }
+}
+
+/* 3 */
+@media
+only screen and (-webkit-min-device-pixel-ratio: 3),
+only screen and (   min--moz-device-pixel-ratio: 3),
+only screen and (     -o-min-device-pixel-ratio: 3/1),
+only screen and (        min-device-pixel-ratio: 3),
+only screen and (                min-resolution: 288dpi),
+only screen and (                min-resolution: 3dppx) {
+    .scaling_text { font-size: 300%; }
+}

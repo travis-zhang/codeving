@@ -1,0 +1,127 @@
+/* container for carousel and arrows */
+.carousel {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+}
+
+/* left and right arrows */
+.carousel-arrow {
+    display: inline-block;
+    box-sizing: border-box;
+
+    background-color: #456e59;
+    color: #efe;
+
+    width: 30px;
+    height: 40px;
+    margin-top: 26px;
+}
+
+.carousel-arrow:hover {
+    background-color: #586;
+}
+
+.carousel-arrow canvas {
+    position: relative;
+    left: 5px;
+    top: 9px;
+}
+
+.carousel-arrow-l {
+    float: left;
+}
+
+.carousel-arrow-r {
+    float: right;
+}
+
+/* track holding partially visible carousel items */
+.carousel-track {
+    display: inline-block;
+    width: 240px;
+    height: 66px;
+
+    font-size: 14px;
+    color: #456e59;
+
+    overflow: hidden;
+}
+
+/* carousel item list */
+ul.carousel-items {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 640px;
+
+    /* set this to scroll */
+    margin-left: 0;
+    transition: margin-left 0.15s ease-out;
+}
+
+/* carousel item components */
+li.carousel-item {
+    float: left;
+    display: inline-block;
+    box-sizing: border-box;
+    width: 80px;
+}
+
+li.carousel-item.disabled {
+    opacity: 0.4;
+    transition: opacity 0.2s linear;
+}
+
+li.carousel-item .box {
+    box-sizing: border-box;
+    height: 40px;
+
+    background-color: #17201c;
+    border: 1px solid #456e59;
+    border-left: none;
+
+    text-align: center;
+    line-height: 24px;
+    padding: 8px 14px;
+
+    color: #456e59;
+}
+
+li.carousel-item:first-child .box {
+    border-left: 1px solid #456e59;
+}
+
+li.carousel-item .count {
+    width: 100%;
+    height: 16px;
+    text-align: center;
+}
+
+li.carousel-item .count-line {
+    width: 1px;
+    height: 10px;
+    background-color: #456e59;
+    margin-left: 40px;
+}
+
+li.carousel-item i {
+    display: inline-block;
+
+    width: 24px;
+    height: 24px;
+    margin-right: 5px;
+    float: left;
+
+    background-image: url( ../images/detection_type_icons.png );
+    background-repeat: no-repeat;
+}
+
+i.icon-oas { background-position:   0px center; }
+i.icon-ods { background-position: -24px center; }
+i.icon-wav { background-position: -48px center; }
+i.icon-mav { background-position: -72px center; }
+i.icon-ids { background-position: -96px center; }
+i.icon-vul { background-position: -120px center; }
+i.icon-kas { background-position: -144px center; }
+i.icon-bad { background-position: -168px center; }

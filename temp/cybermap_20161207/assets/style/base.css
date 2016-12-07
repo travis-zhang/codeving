@@ -1,0 +1,9 @@
+body, * {
+    margin: 0px;
+    padding: 0px;
+    color: #FFFFFF;
+    font-style: inherit;
+    font-size: 14px;
+    font-family: 'Ubuntu Mono', monospace;
+    outline: 0;
+}
