@@ -1,0 +1,69 @@
+js-cdn
+---------------------------------------------------------------------------
+NO1-
+bootcnd 稳定、快速、免费的开源项目 CDN 服务 共收录了 2651 个开源项目
+http://www.bootcdn.cn/	
+
+NO2-
+cdnjs
+https://cdnjs.com/
+	https://github.com/cdnjs/cdnjs
+
+NO3-
+百度静态资源公共库
+http://cdn.code.baidu.com/
+	https://github.com/Clouda-team/baiducdnstatic
+
+-------------------------------------------------------------------------
+
+收费：
+
+腾讯
+	https://www.qcloud.com/act/try?t=cdn
+	（弹性计算、存储与CDN、数据库、安全服务）
+
+阿里云
+	https://www.aliyun.com/product/cdn/?utm_medium=text&utm_source=baidu&utm_campaign=cdn&utm_content=se_180367
+	内容分发网络（Content Delivery Network，简称 CDN）将源站内容分发至全国所有的节点，缩短用户查看对象的延迟，提高用户访问网站的响应速度与网站的可用性，解决网络带宽小、用户访问量大、网点分布不均等问题
+
+风起云
+	http://www.fengqiyun.com/products/content-delivery-network/
+
+百度
+	http://su.baidu.com/product/cdn.html
+
+七牛云
+	http://www.qiniu.com/products/fusion?utm_campaign=baiduSEM&utm_source=baiduSEM&utm_medium=baiduSEM&utm_content=baiduSEM
+
+知道创宇
+	https://www.yunaq.com/jsl/?ad_code=JSL_00120173&utm_source=baidu&utm_medium=SEM#price
+	CDN以流量方式计费，计费周期按小时计费。购买流量从购买之日起一年有效，一年后流量清零。
+
+上海云盾
+	https://www.yundun.com/
+
+---------------------------------------------------------------------------
+互联先锋|GCDN 全球内容分发网络
+	http://www.idcicp.com/gcdn/?source=bdclkid
+	GCDN，全称是Global Content Delivery Network，全球内容分发网络。互联先锋GCDN通过分布在世界各地的多个数据中心节点加速，网站会在世界各地的访问速度大大加快，依靠其分布于欧、美、亚等地的数据中心，在世界范围内为你的站点进行加速。
+
+亚马逊
+	https://aws.amazon.com/cn/events/storage/?sc_channel=ps&sc_campaign=baidudgcampaign&sc_publisher=baidu&sc_detail={%E4%BA%9A%E9%A9%AC%E9%80%8A%20CDN}&sc_country=cn&sc_geo=chna&sc_category=mult&sc_segment={CS|CS_Product_CDN}&sc_outcome=ln&trkCampaign=inbounddgstor&trk=Baidu|CS|CS_Product_CDN|%E4%BA%9A%E9%A9%AC%E9%80%8A%20CDN
+
+国外免费
+---------------------------------------------------------------------------
+CloudFlare
+	https://www.cloudflare.com/
+	CloudFlare算是比较大的国外免费CDN服务平台，提供免费和付费服务，一般我们使用主机的朋友都有清楚，甚至和CPANEL主机面板绑定可以给我们网站提速。如果是英文网站我们可以考虑使用，还具备防护攻击的作用，之前老左在linode的网站就被人无聊攻击，然后用CloudFlare就稍微好一些抵挡住。
+
+Incapsula
+	https://www.incapsula.com/
+	Incapsula是一家新加坡的CDN服务商，我们使用他的原因就是能够提供有新加坡节点的服务，英文网站使用肯定是没有问题，而且如果需要用到中文网站，新加坡节点速度对于国内的访问还是比较快的。去年老左有使用过，这家产品有时候一个月要维护好几次，不知道现在是否还这样。
+
+TinyCDN
+
+	TinyCDN是依靠亚马逊网络提供的CDN服务，主要还是收费用户免费的只能提供30天的试用，如果不怕折腾每月换一次的还是可以试试的。因为他们是主做付费的，所以免费用户我认为速度应该给予的不错，毕竟想忽悠我们升级付费嘛。
+
+jsDelivr
+	http://www.jsdelivr.com/
+	从域名我们就可以看到可以提供免费的JS加速的，如果我们网站或者需要用功一些JS服务，我们可以提交后获取远程调用的JS服务。这样我们在网站中可以节省JS文件，实现共享。总之，一般我们免费的还是使用第一和第二种居多，如果有条件的可以升级付费服务。
