@@ -1,0 +1,61 @@
+https://www.atlassian.com/software
+
+
+http://atlassian.csdn.net/m/btc/atlassian/product_list
+
+
+|||计划、跟踪、支持|||
+
+JIRA Software是优秀的敏捷项目工具，协助您追踪问题，集成代码，规划，开发，发布高质量的软件产品。上万个团队选择JIRA Software对日常事务进行跟踪，并使团队始终获得最新信息。
+
+JIRA Servcie Desk客户期盼着有效率的支持反馈，而你的业务也依赖于此。JIRA Servcie Desk为你的客户提供了简单直观的用户体验，并集成了强大的SLA支持、可自定义的服务队列、自动化的请求管理以及实时的报表。
+
+JIRA Core (原名JIRA) 是一个专业的项目跟踪管理工具，帮助团队创建计划任务、构建并发布优秀的产品。
+
+StatusPage
+当有宕机事故发生，能保证你不被用户反馈的洪水般的邮件支持信息中。
+
+
+
+
+
+|||协同与沟通|||
+
+Confluence将团队成员紧密团结在一起，带领团队同心协力地在线编写文档，使团队成员工作更有效率。请不要把宝贵的时间浪费在无休无止的邮件和毫无意义的会议中，因为Confluence能让你每天的工作更高效。
+
+HipChat是为企业和团队设计的即时沟通工具，支持部署在您自己的企业服务器上。提供了聊天室、视频聊天，可以分享您的想法和文件。让团队远离AIM、谷歌Talk和Skype – HipChat是位商业用途而建。
+
+
+
+
+
+
+|||代码集成与交互|||
+
+Bitbucket  是一款强大的企业级Git代码库管理工具。它安全、快速，既适用于中小团队，也适用于大型组织。通过Bitbucket，你可以方便的创建和管理代码仓库，设置精细的访问控制权限，在代码级进行协同。
+
+SourceTree 是一个免费的Git和Mercurial代码即成工具，有免费的Mac和Windows下的客户端，非常的漂亮、很实用
+
+Bamboo  任何一种构建服务器都可以反复运行构建任务，再高级一些的能够自动构建、测试、部署和发布软件。Bamboo采用自动化管理的构建代理模式。
+
+FishEye  掌握源代码相关的全部信息：可搜索源代码工件，与JIRA集成，浏览提交信息、文件、修订版本及开发者。
+
+Crucible  代码评审有利于提交更好的代码，代码审查的好处是巨大的，但实践执行也许是十分痛苦的，Crucible能够帮助你解除这种痛苦。
+
+Clover   Java和Groovy测试代码覆盖率工具，Clover可以在您的集成开发环境和持续集成系统中运行，包括为了使您的测试运行更加迅速以及更快找到错误与漏洞而进行的测试优化。
+
+
+
+
+||| 其它 |||
+
+Crowd 一个单点登录和用户统一ID管理产品，他能通过LDAP、Google Apps、Active Directory、OpenID等方式对JIRA、Confluence、Bitbucket、FishEye、Crucible、Bamboo等产品进行无缝集成，以支持形成综合的平台话解决方案。
+
+Add-ons （2,465个插件） &  Marketplace
+插件市场，以插件的方式为atlassian体系下的产品做功能精炼、补充，丰富产品功能。
+
+Data Center & Enterprise Services
+针对大规模企业级服务需求和数据中心的支持
+
+Training
+培训服务
