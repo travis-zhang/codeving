@@ -27,3 +27,28 @@ http://freesourcecode.net/javaprojects#.WFEXUaKGO7M
 NO5.
 Java Example
 http://www.java-examples.com/
+
+
+NO.6
+Java Practices
+http://www.javapractices.com/home/HomeAction.do
+
+
+NO.7
+kick java
+http://kickjava.com/
+
+NO.8
+grep code jar
+http://grepcode.com/
+
+NO.9
+DocJar
+http://www.docjar.com/
+
+
+NO.10
+http://www.syncedit.com/toolonline/jchv/
+
+NO.11
+http://www.java-source.net/
