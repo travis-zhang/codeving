@@ -1,4 +1,29 @@
+NO1.
+TKP: Teaching Kids Programming
+	tkpjava.org
+	http://teachingkidsprogramming.org/
+		https://www.penflip.com/lynnlangit/tkp-lesson-plans/blob/master/course01.txt
+		https://github.com/TeachingKidsProgramming
+	YouTube:
+	  TKP: Teaching Kids Programming
 
+
+NO2.
+http://www.learnjavaonline.org/
+
+
+NO3.
+http://wikieducator.org/How_to_Teach_Java
+	NO3-1.Robocode java版坦克大战
+	http://robocode.sourceforge.net/
+	https://sourceforge.net/projects/robocode/files/
+	http://robowiki.net/wiki/Robocode_Basics
+
+NO4.
 Java projects, Java source code and java examples
 http://freesourcecode.net/javaprojects#.WFEXUaKGO7M
 
+
+NO5.
+Java Example
+http://www.java-examples.com/
